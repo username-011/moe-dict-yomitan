@@ -1,7 +1,8 @@
 import { Dictionary, DictionaryIndex, TermEntry } from "yomichan-dict-builder";
 import { read, utils } from "xlsx";
 import * as fs from "fs/promises";
-import OpenCC from "opencc";
+import _OpenCC from "opencc";
+const { OpenCC } = _OpenCC;
 
 const someEntry = {
   __rowNum__: 2541,
