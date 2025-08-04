@@ -1,5 +1,5 @@
 {
-  "name": "moe-dicts-yomitan",
+  "name": "moe-dict-yomitan",
   "module": "index.ts",
   "type": "module",
   "private": true,
