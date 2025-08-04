@@ -1,15 +1,8 @@
 # moe-concised-dict-yomitan
 
-To install dependencies:
+# Build
 
-```bash
-bun install
 ```
-
-To run:
-
-```bash
-bun run index.ts
+npm install
+npx ts-node index.ts
 ```
-
-This project was created using `bun init` in bun v1.2.16. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
