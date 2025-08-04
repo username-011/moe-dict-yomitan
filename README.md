@@ -2,5 +2,7 @@
 
 # Build
 
-- npm install
-- npx ts-node index.ts
+```
+npm install
+npx ts-node index.ts
+```
