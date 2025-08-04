@@ -31,7 +31,7 @@ const zhuyinRevisedDic = new Dictionary({ fileName: "moe-revised-zhuyin.zip" });
 const pinyinRevisedDic = new Dictionary({ fileName: "moe-revised-pinyin.zip" });
 const zhuyinIndexConcised = new DictionaryIndex()
   .setTitle("國語辭典簡編本 注音")
-  .setRevision("1.2")
+  .setRevision("1.3")
   .setAuthor("shadow")
   .setAttribution("國語辭典簡編本 (2014)")
   .setDescription(
@@ -70,7 +70,7 @@ await zhuyinRevisedDic.setIndex(
 await pinyinRevisedDic.setIndex(
   pinyinIndexConcised
     .setTitle("重編國語辭典修訂本 拼音")
-    .setRevision("1.0")
+    .setRevision("1.1")
     .setDescription(
       "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
     )
