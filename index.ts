@@ -25,7 +25,7 @@ const zhuyinDic = new Dictionary({ fileName: "moe-concised-zhuyin.zip" });
 const pinyinDic = new Dictionary({ fileName: "moe-concised-pinyin.zip" });
 const zhuyinIndex = new DictionaryIndex()
   .setTitle("國語辭典簡編本 注音")
-  .setRevision("1.1")
+  .setRevision("1.2")
   .setAuthor("shadow")
   .setAttribution("國語辭典簡編本 (2014)")
   .setDescription(
@@ -34,7 +34,7 @@ const zhuyinIndex = new DictionaryIndex()
   .build();
 const pinyin = new DictionaryIndex()
   .setTitle("國語辭典簡編本 拼音")
-  .setRevision("1.1")
+  .setRevision("1.2")
   .setAuthor("shadow")
   .setAttribution("國語辭典簡編本 (2014)")
   .setDescription(
@@ -55,7 +55,7 @@ console.log(
     .map((l) => l.trim())
     .filter((l) => l.length > 0)
 );
-const simplifiedConverter = new OpenCC("t2s.json");
+const simplifiedConverter = new OpenCC("tw2sp.json");
 let i = 0;
 for (const entry of data) {
   const {
