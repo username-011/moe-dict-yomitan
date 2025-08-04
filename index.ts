@@ -39,7 +39,7 @@ const zhuyinIndexConcised = new DictionaryIndex()
   );
 const pinyinIndexConcised = new DictionaryIndex()
   .setTitle("國語辭典簡編本 拼音")
-  .setRevision("1.2")
+  .setRevision("1.3")
   .setAuthor("shadow")
   .setAttribution("國語辭典簡編本 (2014)")
   .setDescription(
@@ -58,7 +58,7 @@ await pinyinConcisedDic.setIndex(
 await zhuyinRevisedDic.setIndex(
   zhuyinIndexConcised
     .setTitle("重編國語辭典修訂本 注音")
-    .setRevision("1.0")
+    .setRevision("1.1")
     .setDescription(
       "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
     )
@@ -88,7 +88,7 @@ const sheetConcised = workbookConcised.Sheets[workbookConcised.SheetNames[0]!]!;
 const sheetRevised = workbookRevised.Sheets[workbookRevised.SheetNames[0]!]!;
 const dataConcised = utils.sheet_to_json(sheetConcised) as Entry[];
 const dataRevised = utils.sheet_to_json(sheetRevised) as Entry[];
-const simplifiedConverter = new OpenCC("tw2sp.json");
+const simplifiedConverter = new OpenCC("tw2s.json");
 let a = 0;
 for (let i = 0; i < 2; i++) {
   for (const entry of i === 0 ? dataConcised : dataRevised) {
