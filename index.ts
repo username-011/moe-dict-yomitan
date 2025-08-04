@@ -62,6 +62,7 @@ await zhuyinRevisedDic.setIndex(
     .setDescription(
       "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
     )
+    .setAttribution("重編國語辭典修訂本 (2015)")
     .build(),
   "build",
   "index-revised-zhuyin.json"
@@ -73,6 +74,7 @@ await pinyinRevisedDic.setIndex(
     .setDescription(
       "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
     )
+    .setAttribution("重編國語辭典修訂本 (2015)")
     .build(),
   "build",
   "index-revised-pinyin.json"
