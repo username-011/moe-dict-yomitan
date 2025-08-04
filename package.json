@@ -13,10 +13,5 @@
     "opencc": "github:BYVoid/OpenCC",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "yomichan-dict-builder": "^2.9.2"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "opencc"
-    ]
   }
 }
