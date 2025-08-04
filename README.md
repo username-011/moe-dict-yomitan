@@ -1,4 +1,4 @@
-# moe-concised-dict-yomitan
+# moe-dict-yomitan
 
 # Build
 
