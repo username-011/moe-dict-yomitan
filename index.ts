@@ -205,13 +205,13 @@ const liangAnDicPinyin = new Dictionary({
 });
 const zhuyinIndexLiangAn = new DictionaryIndex()
   .setTitle("兩岸詞典 注音")
-  .setRevision("1.0")
+  .setRevision("1.1")
   .setAuthor("shadow")
   .setAttribution("兩岸詞典 (2015)")
   .setDescription("A monolingual dictionary of Mandarin Chinese.");
 const pinyinIndexLiangAn = new DictionaryIndex()
   .setTitle("兩岸詞典 拼音")
-  .setRevision("1.0")
+  .setRevision("1.1")
   .setAuthor("shadow")
   .setAttribution("兩岸詞典 (2015)")
   .setDescription("A monolingual dictionary of Mandarin Chinese.");
