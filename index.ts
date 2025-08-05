@@ -239,7 +239,7 @@ for (const entry of dataLiangAn) {
     臺灣音讀: zhuyinReading,
     臺灣漢拼: pinyinReading,
   } = entry;
-  const adjustedZhuyinReading = (zhuyinReading ?? "").replace("丨", "ㄧ");
+  const adjustedZhuyinReading = (zhuyinReading ?? "").replaceAll("丨", "ㄧ");
   let adjustedMeaning = `【${termTrad}】 `;
   if (!!termSimpl && termTrad !== termSimpl)
     adjustedMeaning += `【${termSimpl}】 `;
