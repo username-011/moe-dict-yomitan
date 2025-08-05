@@ -31,7 +31,7 @@ const zhuyinRevisedDic = new Dictionary({ fileName: "moe-revised-zhuyin.zip" });
 const pinyinRevisedDic = new Dictionary({ fileName: "moe-revised-pinyin.zip" });
 const zhuyinIndexConcised = new DictionaryIndex()
   .setTitle("國語辭典簡編本 注音")
-  .setRevision("1.3")
+  .setRevision("1.4")
   .setAuthor("shadow")
   .setAttribution("國語辭典簡編本 (2014)")
   .setDescription(
@@ -39,7 +39,7 @@ const zhuyinIndexConcised = new DictionaryIndex()
   );
 const pinyinIndexConcised = new DictionaryIndex()
   .setTitle("國語辭典簡編本 拼音")
-  .setRevision("1.3")
+  .setRevision("1.4")
   .setAuthor("shadow")
   .setAttribution("國語辭典簡編本 (2014)")
   .setDescription(
@@ -58,7 +58,7 @@ await pinyinConcisedDic.setIndex(
 await zhuyinRevisedDic.setIndex(
   zhuyinIndexConcised
     .setTitle("重編國語辭典修訂本 注音")
-    .setRevision("1.1")
+    .setRevision("1.2")
     .setDescription(
       "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
     )
@@ -70,7 +70,7 @@ await zhuyinRevisedDic.setIndex(
 await pinyinRevisedDic.setIndex(
   pinyinIndexConcised
     .setTitle("重編國語辭典修訂本 拼音")
-    .setRevision("1.1")
+    .setRevision("1.2")
     .setDescription(
       "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
     )
@@ -113,7 +113,7 @@ for (let i = 0; i < 2; i++) {
       .addDetailedDefinition(
         adjustedMeaning +
           (altZhuyinReading && altZhuyinReading.trim()
-            ? `變體注音: 【${altZhuyinReading}】\n`
+            ? `變體注音: 【${altZhuyinReading.trim()}】\n`
             : "\n") +
           trimmedMeaning
       );
@@ -122,7 +122,7 @@ for (let i = 0; i < 2; i++) {
       .addDetailedDefinition(
         adjustedMeaning +
           (altPinyinReading && altPinyinReading.trim()
-            ? `變體漢語拼音: 【${altPinyinReading}】\n`
+            ? `變體漢語拼音: 【${altPinyinReading.trim()}】\n`
             : "\n") +
           trimmedMeaning
       );
@@ -205,13 +205,13 @@ const liangAnDicPinyin = new Dictionary({
 });
 const zhuyinIndexLiangAn = new DictionaryIndex()
   .setTitle("兩岸詞典 注音")
-  .setRevision("1.1")
+  .setRevision("1.2")
   .setAuthor("shadow")
   .setAttribution("兩岸詞典 (2015)")
   .setDescription("A monolingual dictionary of Mandarin Chinese.");
 const pinyinIndexLiangAn = new DictionaryIndex()
   .setTitle("兩岸詞典 拼音")
-  .setRevision("1.1")
+  .setRevision("1.2")
   .setAuthor("shadow")
   .setAttribution("兩岸詞典 (2015)")
   .setDescription("A monolingual dictionary of Mandarin Chinese.");
@@ -238,26 +238,41 @@ for (const entry of dataLiangAn) {
     簡化字形: termSimpl,
     臺灣音讀: zhuyinReading,
     臺灣漢拼: pinyinReading,
+    大陸音讀: mZhuyinReading,
+    大陸漢拼: mPinyinReading,
   } = entry;
   const adjustedZhuyinReading = (zhuyinReading ?? "").replaceAll("丨", "ㄧ");
   let adjustedMeaning = `【${termTrad}】 `;
   if (!!termSimpl && termTrad !== termSimpl)
     adjustedMeaning += `【${termSimpl}】 `;
+  const meanings: string[] = [];
   for (let i = 1; i <= 30; i++) {
     //@ts-ignore eh, this is a dynamic key
     const meaning = entry[`釋義${i}`] as string | undefined;
     if (meaning) {
-      adjustedMeaning += `\n${meaning.trim()}`;
+      meanings.push(`\n${meaning.trim()}`);
     } else {
       break;
     }
   }
   const zhuyinTermEntry = new TermEntry(termTrad)
     .setReading(adjustedZhuyinReading.trim())
-    .addDetailedDefinition(adjustedMeaning);
+    .addDetailedDefinition(
+      adjustedMeaning +
+        (mZhuyinReading && mZhuyinReading !== zhuyinReading
+          ? `大陸音讀: 【${mZhuyinReading.replaceAll("丨", "ㄧ").trim()}】`
+          : "") +
+        meanings.join("")
+    );
   const pinyinTermEntry = new TermEntry(termTrad)
     .setReading(pinyinReading ? pinyinReading.trim() : "")
-    .addDetailedDefinition(adjustedMeaning);
+    .addDetailedDefinition(
+      adjustedMeaning +
+        (mPinyinReading && mPinyinReading !== pinyinReading
+          ? `大陸漢拼: 【${mPinyinReading.trim()}】`
+          : "") +
+        meanings.join("")
+    );
   await Promise.all([
     liangAnDicZhuyin.addTerm(zhuyinTermEntry.build()),
     liangAnDicPinyin.addTerm(pinyinTermEntry.build()),
