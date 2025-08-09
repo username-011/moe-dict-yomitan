@@ -18,8 +18,15 @@ const someEntry = {
   漢語拼音: "pái",
   變體漢語拼音: "abc",
   釋義: "1.揭示或標誌用的看板。[例]門牌、車牌、招牌\n2.商標。[例]總統牌香菸\n3.神位。[例]牌位、靈牌、神主牌\n4.一種古代的兵器，即盾牌。[例]籐牌、擋箭牌\n5.賭具或娛樂用品。[例]橋牌、紙牌、撲克牌\n6.詞或曲的曲調名稱。[例]詞牌、曲牌",
+  相似詞: "abc",
+  相反詞: "def",
 };
-type Entry = typeof someEntry;
+type Entry = Record<string, string | undefined> & typeof someEntry;
+
+// for the concised and revised dictionaries
+const addSynonymsAntonyms = true;
+// for the LiangAn dictionary
+const addMainlandTWDistinctions = true;
 
 const zhuyinConcisedDic = new Dictionary({
   fileName: "moe-concised-zhuyin.zip",
@@ -31,7 +38,7 @@ const zhuyinRevisedDic = new Dictionary({ fileName: "moe-revised-zhuyin.zip" });
 const pinyinRevisedDic = new Dictionary({ fileName: "moe-revised-pinyin.zip" });
 const zhuyinIndexConcised = new DictionaryIndex()
   .setTitle("國語辭典簡編本 注音")
-  .setRevision("1.4")
+  .setRevision("1.5")
   .setAuthor("shadow")
   .setAttribution("國語辭典簡編本 (2014)")
   .setDescription(
@@ -39,7 +46,7 @@ const zhuyinIndexConcised = new DictionaryIndex()
   );
 const pinyinIndexConcised = new DictionaryIndex()
   .setTitle("國語辭典簡編本 拼音")
-  .setRevision("1.4")
+  .setRevision("1.5")
   .setAuthor("shadow")
   .setAttribution("國語辭典簡編本 (2014)")
   .setDescription(
@@ -58,7 +65,7 @@ await pinyinConcisedDic.setIndex(
 await zhuyinRevisedDic.setIndex(
   zhuyinIndexConcised
     .setTitle("重編國語辭典修訂本 注音")
-    .setRevision("1.2")
+    .setRevision("1.3")
     .setDescription(
       "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
     )
@@ -70,7 +77,7 @@ await zhuyinRevisedDic.setIndex(
 await pinyinRevisedDic.setIndex(
   pinyinIndexConcised
     .setTitle("重編國語辭典修訂本 拼音")
-    .setRevision("1.2")
+    .setRevision("1.3")
     .setDescription(
       "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
     )
@@ -92,39 +99,62 @@ const simplifiedConverter = new OpenCC("tw2s.json");
 let a = 0;
 for (let i = 0; i < 2; i++) {
   for (const entry of i === 0 ? dataConcised : dataRevised) {
+    // trim all the fields of entry before processing
+    for (const key in entry) {
+      if (key === "釋義") {
+        entry[key] = (entry[key] ?? "")
+          .split("\n")
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0)
+          .join("\n");
+      } else if (typeof entry[key] === "string") {
+        entry[key] = entry[key].trim();
+      }
+    }
+
     const {
       字詞名: term,
       注音一式: zhuyinReading,
       變體注音: altZhuyinReading,
       漢語拼音: pinyinReading,
       變體漢語拼音: altPinyinReading,
-      釋義,
+      釋義: meaning,
+      相似詞: synonyms,
+      相反詞: antonyms,
     } = entry;
     const simplifiedTerm = simplifiedConverter.convertSync(term);
-    const trimmedMeaning = (釋義 ?? "")
-      .split("\n")
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0)
-      .join("\n");
-    let adjustedMeaning = `【${term}】 `;
-    if (term !== simplifiedTerm) adjustedMeaning += `【${simplifiedTerm}】 `;
+    let adjustedMeaning = `【${term}】`;
+    if (term !== simplifiedTerm) adjustedMeaning += ` 【${simplifiedTerm}】`;
+    let additionalFieldsRow = "";
+    if (addSynonymsAntonyms) {
+      if (synonyms) {
+        if (i === 1) additionalFieldsRow += "[似]";
+        additionalFieldsRow += synonyms;
+      }
+      if (antonyms) {
+        if (additionalFieldsRow.length > 0) additionalFieldsRow += "\n";
+        if (i === 1) additionalFieldsRow += "[反]";
+        additionalFieldsRow += antonyms;
+      }
+      if (additionalFieldsRow.length > 0) additionalFieldsRow += "\n";
+    }
     const zhuyinTermEntry = new TermEntry(term)
-      .setReading(zhuyinReading ? zhuyinReading.trim() : "")
+      .setReading(zhuyinReading ?? "")
       .addDetailedDefinition(
         adjustedMeaning +
-          (altZhuyinReading && altZhuyinReading.trim()
-            ? `變體注音: 【${altZhuyinReading.trim()}】\n`
-            : "\n") +
-          trimmedMeaning
+          (altZhuyinReading ? `變體注音: 【${altZhuyinReading}】` : "") +
+          "\n" +
+          additionalFieldsRow +
+          meaning
       );
     const pinyinTermEntry = new TermEntry(term)
-      .setReading(pinyinReading ? pinyinReading.trim() : "")
+      .setReading(pinyinReading ?? "")
       .addDetailedDefinition(
         adjustedMeaning +
-          (altPinyinReading && altPinyinReading.trim()
-            ? `變體漢語拼音: 【${altPinyinReading.trim()}】\n`
-            : "\n") +
-          trimmedMeaning
+          (altPinyinReading ? `變體漢語拼音: 【${altPinyinReading}】` : "") +
+          "\n" +
+          additionalFieldsRow +
+          meaning
       );
     await Promise.all([
       i === 0
@@ -193,9 +223,10 @@ type NumericRange<
     >;
 type Meanings = `釋義${NumericRange<1, 30>}`;
 
-type LiangAnEntry = typeof someLiangAnEntry & {
-  [K in Meanings]?: string;
-};
+type LiangAnEntry = Record<string, string | undefined> &
+  typeof someLiangAnEntry & {
+    [K in Meanings]?: string;
+  };
 
 const liangAnDicZhuyin = new Dictionary({
   fileName: "liangancidian-zhuyin.zip",
@@ -205,13 +236,13 @@ const liangAnDicPinyin = new Dictionary({
 });
 const zhuyinIndexLiangAn = new DictionaryIndex()
   .setTitle("兩岸詞典 注音")
-  .setRevision("1.2")
+  .setRevision("1.3")
   .setAuthor("shadow")
   .setAttribution("兩岸詞典 (2015)")
   .setDescription("A monolingual dictionary of Mandarin Chinese.");
 const pinyinIndexLiangAn = new DictionaryIndex()
   .setTitle("兩岸詞典 拼音")
-  .setRevision("1.2")
+  .setRevision("1.3")
   .setAuthor("shadow")
   .setAttribution("兩岸詞典 (2015)")
   .setDescription("A monolingual dictionary of Mandarin Chinese.");
@@ -233,6 +264,18 @@ const dataLiangAn = utils.sheet_to_json(sheetLiangAn) as LiangAnEntry[];
 
 let b = 0;
 for (const entry of dataLiangAn) {
+  // preprocess a little bit
+  for (const key in entry) {
+    // some keys have "丨" in them (supposed to be used in vertical text, but we use horizontal text)
+    if (["臺灣音讀", "大陸音讀"].includes(key) || key.startsWith("釋義")) {
+      entry[key] = (entry[key] ?? "").replaceAll("丨", "ㄧ");
+    }
+    // not all keys have trimming so maybe apply it just in case
+    if (typeof entry[key] === "string") {
+      entry[key] = entry[key].trim();
+    }
+  }
+
   const {
     正體字形: termTrad,
     簡化字形: termSimpl,
@@ -240,37 +283,46 @@ for (const entry of dataLiangAn) {
     臺灣漢拼: pinyinReading,
     大陸音讀: mZhuyinReading,
     大陸漢拼: mPinyinReading,
+    // star is Mainland, triangle is Taiwan
+    "臺／陸特有詞": taiwanOrChinaTerm,
+    "臺／陸特有音": taiwanOrChinaReading,
   } = entry;
-  const adjustedZhuyinReading = (zhuyinReading ?? "").replaceAll("丨", "ㄧ");
-  let adjustedMeaning = `【${termTrad}】 `;
+  let adjustedMeaning = `【${termTrad}】`;
   if (!!termSimpl && termTrad !== termSimpl)
-    adjustedMeaning += `【${termSimpl}】 `;
+    adjustedMeaning += ` 【${termSimpl}】`;
   const meanings: string[] = [];
   for (let i = 1; i <= 30; i++) {
-    //@ts-ignore eh, this is a dynamic key
     const meaning = entry[`釋義${i}`] as string | undefined;
     if (meaning) {
-      meanings.push(`\n${meaning.trim()}`);
+      meanings.push(`\n${meaning}`);
     } else {
       break;
     }
   }
+  let additionalInfo = "";
+  if (addMainlandTWDistinctions) {
+    if (taiwanOrChinaTerm) additionalInfo += `詞: ${taiwanOrChinaTerm} `;
+    if (taiwanOrChinaReading) additionalInfo += `音: ${taiwanOrChinaReading}`;
+    if (additionalInfo.length > 0) additionalInfo = " " + additionalInfo;
+  }
   const zhuyinTermEntry = new TermEntry(termTrad)
-    .setReading(adjustedZhuyinReading.trim())
+    .setReading(zhuyinReading)
     .addDetailedDefinition(
       adjustedMeaning +
         (mZhuyinReading && mZhuyinReading !== zhuyinReading
-          ? `大陸音讀: 【${mZhuyinReading.replaceAll("丨", "ㄧ").trim()}】`
+          ? `大陸音讀: 【${mZhuyinReading}】`
           : "") +
+        additionalInfo +
         meanings.join("")
     );
   const pinyinTermEntry = new TermEntry(termTrad)
-    .setReading(pinyinReading ? pinyinReading.trim() : "")
+    .setReading(pinyinReading ?? "")
     .addDetailedDefinition(
       adjustedMeaning +
         (mPinyinReading && mPinyinReading !== pinyinReading
-          ? `大陸漢拼: 【${mPinyinReading.trim()}】`
+          ? `大陸漢拼: 【${mPinyinReading}】`
           : "") +
+        additionalInfo +
         meanings.join("")
     );
   await Promise.all([
