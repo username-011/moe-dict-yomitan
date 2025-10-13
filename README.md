@@ -4,7 +4,7 @@
 
 ```
 npm install
-npx ts-node index.ts
+npx ts-node export.ts
 ```
 
 # Source
