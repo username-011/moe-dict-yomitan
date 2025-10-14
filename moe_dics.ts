@@ -40,6 +40,8 @@ export async function addFilesConcised(
   });
 }
 
+type AltReadingType = "變" | "又音" | "語音" | "讀音";
+
 export async function addTermsMoe(
   [zhuyinConcisedDic, pinyinConcisedDic, zhuyinRevisedDic, pinyinRevisedDic]: [
     Dictionary,
@@ -120,6 +122,7 @@ export async function addTermsMoe(
         相似詞: synonyms,
         相反詞: antonyms,
         多音排序: order,
+        "變體類型 1:變 2:又音 3:語音 4:讀音": altReadingType,
       } = entry;
       const simplifiedTerm = simplifiedConverter.convertSync(term);
       let adjustedMeaning = `【${term}】`;
@@ -138,14 +141,14 @@ export async function addTermsMoe(
         if (additionalFieldsRow.length > 0) additionalFieldsRow += "\n";
       }
       const [adjustedZhuyinReading, adjustedPinyinReading] =
-        switchAltPronunciations
+        switchAltPronunciations && (altReadingType as AltReadingType) === "變"
           ? [
               altZhuyinReading ?? zhuyinReading,
               altPinyinReading ?? pinyinReading,
             ]
           : [zhuyinReading, pinyinReading];
       const [adjustedAltZhuyinReading, adjustedAltPinyinReading] =
-        switchAltPronunciations
+        switchAltPronunciations && (altReadingType as AltReadingType) === "變"
           ? [
               zhuyinReading !== adjustedZhuyinReading
                 ? zhuyinReading
@@ -155,24 +158,30 @@ export async function addTermsMoe(
                 : undefined,
             ]
           : [altZhuyinReading, altPinyinReading];
+      let altReading = "";
+      switch (altReadingType as AltReadingType) {
+        case "變":
+          altReading = `${
+            switchAltPronunciations ? "本音" : "變體注音"
+          }: 【${adjustedAltZhuyinReading}】`;
+          break;
+        case "又音":
+          altReading = `又音: 【${adjustedAltZhuyinReading}】`;
+          break;
+        case "語音":
+        case "讀音":
+          altReading = altReadingType;
+          break;
+      }
       const contentZhuyin: StructuredContent = [
-        adjustedMeaning +
-          (adjustedAltZhuyinReading
-            ? `${
-                switchAltPronunciations ? "本音" : "變體注音"
-              }: 【${adjustedAltZhuyinReading}】`
-            : "") +
-          "\n" +
-          additionalFieldsRow +
-          meaning,
+        adjustedMeaning + altReading + "\n" + additionalFieldsRow + meaning,
       ];
       const contentPinyin: StructuredContent = [
         adjustedMeaning +
-          (adjustedAltPinyinReading
-            ? `${
-                switchAltPronunciations ? "本音" : "變體漢語拼音"
-              }: 【${adjustedAltPinyinReading}】`
-            : "") +
+          altReading.replace(
+            `【${adjustedAltZhuyinReading}】`,
+            `【${adjustedAltPinyinReading}】`
+          ) +
           "\n" +
           additionalFieldsRow +
           meaning,
