@@ -9,7 +9,7 @@ const concicedSwitchAltPronunciations = true;
 const addSynonymsAntonyms = true;
 // for the LiangAn dictionary
 const addMainlandTWDistinctions = true;
-// makes it so these dictionaries are priotized in the search results (because they have some sort of frequency sort for the 多音字)
+// makes it so these dictionaries are prioritized in the search results (because they have some sort of frequency sort for the 多音字)
 const popularityBoost = 100;
 
 const [
