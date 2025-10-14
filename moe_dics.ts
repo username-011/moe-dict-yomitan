@@ -16,7 +16,7 @@ const someEntry = {
   部首字: "片 ",
   總筆畫數: 12,
   部首外筆畫數: 8,
-  多音排序: 0,
+  多音排序: "0",
   注音一式: "ㄆㄞˊ",
   變體注音: "abc",
   "變體類型 1:變 2:又音 3:語音 4:讀音": "  ",
@@ -53,7 +53,9 @@ export async function addTermsMoe(
     string,
     string
   ],
-  addSynonymsAntonyms = true
+  addSynonymsAntonyms = true,
+  switchAltPronunciations = true,
+  popularityBoost = 100
 ) {
   await addFilesConcised(
     [zhuyinConcisedDic, pinyinConcisedDic],
@@ -117,6 +119,7 @@ export async function addTermsMoe(
         釋義: meaning,
         相似詞: synonyms,
         相反詞: antonyms,
+        多音排序: order,
       } = entry;
       const simplifiedTerm = simplifiedConverter.convertSync(term);
       let adjustedMeaning = `【${term}】`;
@@ -134,16 +137,42 @@ export async function addTermsMoe(
         }
         if (additionalFieldsRow.length > 0) additionalFieldsRow += "\n";
       }
+      const [adjustedZhuyinReading, adjustedPinyinReading] =
+        switchAltPronunciations
+          ? [
+              altZhuyinReading ?? zhuyinReading,
+              altPinyinReading ?? pinyinReading,
+            ]
+          : [zhuyinReading, pinyinReading];
+      const [adjustedAltZhuyinReading, adjustedAltPinyinReading] =
+        switchAltPronunciations
+          ? [
+              zhuyinReading !== adjustedZhuyinReading
+                ? zhuyinReading
+                : undefined,
+              pinyinReading !== adjustedPinyinReading
+                ? pinyinReading
+                : undefined,
+            ]
+          : [altZhuyinReading, altPinyinReading];
       const contentZhuyin: StructuredContent = [
         adjustedMeaning +
-          (altZhuyinReading ? `變體注音: 【${altZhuyinReading}】` : "") +
+          (adjustedAltZhuyinReading
+            ? `${
+                switchAltPronunciations ? "本音" : "變體注音"
+              }: 【${adjustedAltZhuyinReading}】`
+            : "") +
           "\n" +
           additionalFieldsRow +
           meaning,
       ];
       const contentPinyin: StructuredContent = [
         adjustedMeaning +
-          (altPinyinReading ? `變體漢語拼音: 【${altPinyinReading}】` : "") +
+          (adjustedAltPinyinReading
+            ? `${
+                switchAltPronunciations ? "本音" : "變體漢語拼音"
+              }: 【${adjustedAltPinyinReading}】`
+            : "") +
           "\n" +
           additionalFieldsRow +
           meaning,
@@ -173,13 +202,15 @@ export async function addTermsMoe(
         });
       }
       const zhuyinTermEntry = new TermEntry(term)
-        .setReading(zhuyinReading ?? "")
+        .setReading(adjustedZhuyinReading ?? "")
+        .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
         .addDetailedDefinition({
           type: "structured-content",
           content: contentZhuyin,
         });
       const pinyinTermEntry = new TermEntry(term)
-        .setReading(pinyinReading ?? "")
+        .setReading(adjustedPinyinReading ?? "")
+        .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
         .addDetailedDefinition({
           type: "structured-content",
           content: contentPinyin,

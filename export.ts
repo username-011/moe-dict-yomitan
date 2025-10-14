@@ -1,17 +1,16 @@
 import { Dictionary, DictionaryIndex, TermEntry } from "yomichan-dict-builder";
-import type {
-  DetailedDefinition,
-  StructuredContent,
-} from "yomichan-dict-builder/dist/types/yomitan/termbank";
 import { addTermsMoe, type MoeEntry } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
 
 // global for all dictionaries here
-export const VERSION = 2.0;
+const VERSION = 2.1;
+const concicedSwitchAltPronunciations = true;
 // for the concised and revised moe dictionaries
-export const addSynonymsAntonyms = true;
+const addSynonymsAntonyms = true;
 // for the LiangAn dictionary
-export const addMainlandTWDistinctions = true;
+const addMainlandTWDistinctions = true;
+// makes it so these dictionaries are priotized in the search results (because they have some sort of frequency sort for the 多音字)
+const popularityBoost = 100;
 
 const [
   zhuyinConcisedDic,
@@ -22,7 +21,7 @@ const [
   liangAnDicPinyin,
 ] = await initDics();
 
-addTermsMoe(
+await addTermsMoe(
   [zhuyinConcisedDic, pinyinConcisedDic, zhuyinRevisedDic, pinyinRevisedDic],
   [
     "dict/dict_concised_2014_20250925.xlsx",
@@ -30,7 +29,9 @@ addTermsMoe(
     "dict/dict_concised_pic_2014_20250925.xlsx",
     "dict/dict_concised_pic_2014_20250925",
   ],
-  addSynonymsAntonyms
+  addSynonymsAntonyms,
+  concicedSwitchAltPronunciations,
+  popularityBoost
 );
 
 console.log("Exporting MOE dictionaries...");
@@ -43,10 +44,11 @@ console.log("Exported 重編國語辭典修訂本 注音");
 await pinyinRevisedDic.export("build");
 console.log("Exported 重編國語辭典修訂本 拼音");
 
-addTermsLiangAn(
+await addTermsLiangAn(
   [liangAnDicZhuyin, liangAnDicPinyin],
   "dict/liangancidian.xlsx",
-  addMainlandTWDistinctions
+  addMainlandTWDistinctions,
+  popularityBoost
 );
 
 console.log("Exporting LiangAn dictionary...");

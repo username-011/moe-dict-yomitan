@@ -41,7 +41,8 @@ type LiangAnEntry = Record<string, string | undefined> &
 export async function addTermsLiangAn(
   [liangAnDicZhuyin, liangAnDicPinyin]: [Dictionary, Dictionary],
   path: string,
-  addMainlandTWDistinctions = true
+  addMainlandTWDistinctions = true,
+  popularityBoost = 100
 ) {
   const fbLiangAn = readFileSync(path);
   const workbookLiangAn = read(fbLiangAn);
@@ -72,6 +73,7 @@ export async function addTermsLiangAn(
       // star is Mainland, triangle is Taiwan
       "臺／陸特有詞": taiwanOrChinaTerm,
       "臺／陸特有音": taiwanOrChinaReading,
+      音序: order,
     } = entry;
     let adjustedMeaning = `【${termTrad}】`;
     if (!!termSimpl && termTrad !== termSimpl)
@@ -93,6 +95,7 @@ export async function addTermsLiangAn(
     }
     const zhuyinTermEntry = new TermEntry(termTrad)
       .setReading(zhuyinReading)
+      .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
       .addDetailedDefinition(
         adjustedMeaning +
           (mZhuyinReading && mZhuyinReading !== zhuyinReading
@@ -103,6 +106,7 @@ export async function addTermsLiangAn(
       );
     const pinyinTermEntry = new TermEntry(termTrad)
       .setReading(pinyinReading ?? "")
+      .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
       .addDetailedDefinition(
         adjustedMeaning +
           (mPinyinReading && mPinyinReading !== pinyinReading
