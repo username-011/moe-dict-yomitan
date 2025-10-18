@@ -5,7 +5,7 @@ import { addTermsLiangAn } from "./liangan.ts";
 // global for all dictionaries here
 const VERSION = 2.3;
 // only the 變 type
-const concicedSwitchAltPronunciations = true;
+const concisedSwitchAltPronunciations = true;
 // for the concised and revised moe dictionaries
 const addSynonymsAntonyms = true;
 // for the LiangAn dictionary
@@ -31,7 +31,7 @@ await addTermsMoe(
     "dict/dict_concised_pic_2014_20250925",
   ],
   addSynonymsAntonyms,
-  concicedSwitchAltPronunciations,
+  concisedSwitchAltPronunciations,
   popularityBoost
 );
 
