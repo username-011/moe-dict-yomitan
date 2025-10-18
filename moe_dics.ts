@@ -95,7 +95,6 @@ export async function addTermsMoe(
     return acc;
   }, {} as Record<string, { title: string; fileName: string }[]>);
   const simplifiedConverter = new OpenCC("tw2s.json");
-
   let processedEntries = 0;
   for (let i = 0; i < 2; i++) {
     for (const entry of i === 0 ? dataConcised : dataRevised) {
@@ -106,7 +105,13 @@ export async function addTermsMoe(
             .split("\n")
             .map((l) => l.trim())
             .filter((l) => l.length > 0)
-            .join("\n");
+            .join("\n")
+            // fixes words like "(1) ...　(2) ..." to be on separate lines (like 為, 于)
+            .replace(/\(\d+\).*?(?=\()/g, (match) => {
+              match = match.trim();
+              if (match.startsWith("(1")) match = "\n" + match;
+              return match.slice(0, -1) + "\n";
+            });
         } else if (typeof entry[key] === "string") {
           entry[key] = entry[key].trim();
         }
@@ -166,7 +171,9 @@ export async function addTermsMoe(
           }: 【${adjustedAltZhuyinReading}】`;
           break;
         case "又音":
-          altReading = `又音: 【${adjustedAltZhuyinReading}】`;
+          altReading = adjustedAltZhuyinReading
+            ? `又音: 【${adjustedAltZhuyinReading}】`
+            : "又音";
           break;
         case "語音":
         case "讀音":
