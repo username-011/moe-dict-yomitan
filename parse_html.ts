@@ -57,16 +57,14 @@ function parseStyle(s: string): StructuredContentStyle {
   return style;
 }
 
-function add(node: ChildNode | null): StructuredContentNode[] {
-  const content: StructuredContentNode[] = [];
-  if (!node) return content;
+function add(node: ChildNode): StructuredContentNode {
   switch (node.nodeName) {
     case "table":
     case "tbody":
     case "thead":
     case "tfoot":
     case "tr":
-      content.push({
+      return {
         tag: node.nodeName.toLowerCase() as
           | "table"
           | "tbody"
@@ -75,22 +73,18 @@ function add(node: ChildNode | null): StructuredContentNode[] {
           | "tr",
         content: Array.from(node.childNodes).map((c) => add(c)),
         lang: "zh-TW",
-      });
-      break;
+      };
     case "td":
     case "th":
-      content.push({
+      return {
         tag: node.nodeName.toLowerCase() as "td" | "th",
         content: Array.from(node.childNodes).map((c) => add(c)),
         style: parseStyle((node as Element).getAttribute("style") || ""),
         lang: "zh-TW",
-      });
-      break;
+      };
     default:
-      content.push(node.textContent || "");
-      break;
+      return node.textContent || "";
   }
-  return content;
 }
 
 export default function parse_html(data: string): StructuredContent {
@@ -100,7 +94,7 @@ export default function parse_html(data: string): StructuredContent {
   );
   const content: StructuredContent = [];
   Array.from(doc.childNodes.item(0).childNodes).forEach((node) => {
-    content.push(...add(node));
+    content.push(add(node));
   });
   return content.filter((item) => item !== "");
 }
