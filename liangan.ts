@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { read, utils, type StreamUtils } from "xlsx";
+import { read, utils } from "xlsx";
 import { Dictionary, TermEntry } from "yomichan-dict-builder";
 import parse_html from "./parse_html.ts";
 import type {

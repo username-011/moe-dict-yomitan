@@ -1,5 +1,4 @@
 import { DOMParser } from "@xmldom/xmldom";
-import { readFileSync } from "fs";
 import type {
   StructuredContent,
   StructuredContentNode,

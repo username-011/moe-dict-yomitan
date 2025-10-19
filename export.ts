@@ -1,5 +1,5 @@
-import { Dictionary, DictionaryIndex, TermEntry } from "yomichan-dict-builder";
-import { addTermsMoe, type MoeEntry } from "./moe_dics.ts";
+import { Dictionary, DictionaryIndex } from "yomichan-dict-builder";
+import { addTermsMoe } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
 
 // global for all dictionaries here

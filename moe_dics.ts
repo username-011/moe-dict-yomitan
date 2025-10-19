@@ -1,9 +1,8 @@
-import { Dictionary, DictionaryIndex, TermEntry } from "yomichan-dict-builder";
+import { Dictionary, TermEntry } from "yomichan-dict-builder";
 import { readdirSync, readFileSync } from "fs";
 import { read, utils } from "xlsx";
 import _OpenCC from "opencc";
 import type {
-  DetailedDefinition,
   StructuredContent,
   StructuredContentNode,
 } from "yomichan-dict-builder/dist/types/yomitan/termbank";
