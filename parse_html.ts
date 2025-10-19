@@ -83,7 +83,7 @@ function add(node: ChildNode): StructuredContentNode {
         lang: "zh-TW",
       };
     default:
-      return node.textContent || "";
+      return node.textContent ?? "";
   }
 }
 
