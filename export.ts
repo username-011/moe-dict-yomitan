@@ -3,7 +3,7 @@ import { addTermsMoe, type MoeEntry } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
 
 // global for all dictionaries here
-const VERSION = 2.4;
+const VERSION = 2.5;
 // only the 變 type
 const concisedSwitchAltPronunciations = true;
 // for the concised and revised moe dictionaries

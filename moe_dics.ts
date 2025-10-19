@@ -130,8 +130,8 @@ export async function addTermsMoe(
         "變體類型 1:變 2:又音 3:語音 4:讀音": altReadingType,
       } = entry;
       const simplifiedTerm = simplifiedConverter.convertSync(term);
-      let adjustedMeaning = `【${term}】`;
-      if (term !== simplifiedTerm) adjustedMeaning += ` 【${simplifiedTerm}】`;
+      let adjustedTerm = `【${term}】`;
+      if (term !== simplifiedTerm) adjustedTerm += ` 【${simplifiedTerm}】`;
       let additionalFieldsRow = "";
       if (addSynonymsAntonyms) {
         if (synonyms) {
@@ -181,17 +181,21 @@ export async function addTermsMoe(
           break;
       }
       const contentZhuyin: StructuredContent = [
-        adjustedMeaning + altReading + "\n" + additionalFieldsRow + meaning,
+        adjustedTerm,
+        altReading,
+        "\n",
+        additionalFieldsRow,
+        meaning,
       ];
       const contentPinyin: StructuredContent = [
-        adjustedMeaning +
-          altReading.replace(
-            `【${adjustedAltZhuyinReading}】`,
-            `【${adjustedAltPinyinReading}】`
-          ) +
-          "\n" +
-          additionalFieldsRow +
-          meaning,
+        adjustedTerm,
+        altReading.replace(
+          `【${adjustedAltZhuyinReading}】`,
+          `【${adjustedAltPinyinReading}】`
+        ),
+        "\n",
+        additionalFieldsRow,
+        meaning,
       ];
       const entryId = (entry.字詞號 ?? "").trim();
       if (i === 0 && entryId && dataConcisedPicsIndex[entryId]) {

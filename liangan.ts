@@ -1,6 +1,11 @@
 import { readFileSync } from "fs";
-import { read, utils } from "xlsx";
+import { read, utils, type StreamUtils } from "xlsx";
 import { Dictionary, TermEntry } from "yomichan-dict-builder";
+import parse_html from "./parse_html.ts";
+import type {
+  StructuredContent,
+  StructuredContentNode,
+} from "yomichan-dict-builder/dist/types/yomitan/termbank";
 
 const someLiangAnEntry = {
   稿件版本: "1",
@@ -78,11 +83,13 @@ export async function addTermsLiangAn(
     let adjustedMeaning = `【${termTrad}】`;
     if (!!termSimpl && termTrad !== termSimpl)
       adjustedMeaning += ` 【${termSimpl}】`;
-    const meanings: string[] = [];
+    const meanings: StructuredContentNode[] = [];
     for (let i = 1; i <= 30; i++) {
       const meaning = entry[`釋義${i}`] as string | undefined;
       if (meaning) {
-        meanings.push(`\n${meaning}`);
+        meaning.includes("<table")
+          ? meanings.push(parse_html(meaning))
+          : meanings.push(`${meaning}\n`);
       } else {
         break;
       }
@@ -93,28 +100,38 @@ export async function addTermsLiangAn(
       if (taiwanOrChinaReading) additionalInfo += `音: ${taiwanOrChinaReading}`;
       if (additionalInfo.length > 0) additionalInfo = " " + additionalInfo;
     }
+    const contentZhuyin: StructuredContent = [
+      adjustedMeaning,
+      mZhuyinReading && mZhuyinReading !== zhuyinReading
+        ? `大陸音讀: 【${mZhuyinReading}】`
+        : "",
+      additionalInfo,
+      "\n",
+      meanings,
+    ];
+    const contentPinyin: StructuredContent = [
+      adjustedMeaning,
+      mPinyinReading && mPinyinReading !== pinyinReading
+        ? `大陸漢拼: 【${mPinyinReading}】`
+        : "",
+      additionalInfo,
+      "\n",
+      meanings,
+    ];
     const zhuyinTermEntry = new TermEntry(termTrad)
       .setReading(zhuyinReading)
       .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
-      .addDetailedDefinition(
-        adjustedMeaning +
-          (mZhuyinReading && mZhuyinReading !== zhuyinReading
-            ? `大陸音讀: 【${mZhuyinReading}】`
-            : "") +
-          additionalInfo +
-          meanings.join("")
-      );
+      .addDetailedDefinition({
+        type: "structured-content",
+        content: contentZhuyin,
+      });
     const pinyinTermEntry = new TermEntry(termTrad)
       .setReading(pinyinReading ?? "")
       .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
-      .addDetailedDefinition(
-        adjustedMeaning +
-          (mPinyinReading && mPinyinReading !== pinyinReading
-            ? `大陸漢拼: 【${mPinyinReading}】`
-            : "") +
-          additionalInfo +
-          meanings.join("")
-      );
+      .addDetailedDefinition({
+        type: "structured-content",
+        content: contentPinyin,
+      });
     await Promise.all([
       liangAnDicZhuyin.addTerm(zhuyinTermEntry.build()),
       liangAnDicPinyin.addTerm(pinyinTermEntry.build()),
