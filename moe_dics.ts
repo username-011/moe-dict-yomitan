@@ -110,7 +110,7 @@ export async function addTermsMoe(
             .replace(/\(\d+\).*?(?=\()/g, (match) => {
               match = match.trim();
               if (match.startsWith("(1")) match = "\n" + match;
-              return match.slice(0, -1) + "\n";
+              return match + "\n";
             });
         } else if (typeof entry[key] === "string") {
           entry[key] = entry[key].trim();
