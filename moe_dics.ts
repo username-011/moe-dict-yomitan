@@ -41,6 +41,161 @@ export async function addFilesConcised(
 
 type AltReadingType = "變" | "又音" | "語音" | "讀音";
 
+function getAltReadingContent(
+  altReadingType: string,
+  switchAltPronunciations: boolean,
+  reading?: string
+): StructuredContentNode {
+  switch (altReadingType as AltReadingType) {
+    case "變":
+      return {
+        tag: "span",
+        data: { moedict: "alt-reading-parent", altReadingType },
+        content: [
+          {
+            tag: "span",
+            content: `${switchAltPronunciations ? "本音" : "變體注音"}`,
+            data: { moedict: "alt-reading-label" },
+          },
+          {
+            tag: "span",
+            data: { moedict: "alt-reading-content" },
+            content: reading ?? "",
+          },
+        ],
+      };
+    case "又音":
+      const youin: StructuredContentNode = {
+        tag: "span",
+        content: "又音",
+        data: { moedict: "alt-reading-label" },
+      };
+      return {
+        tag: "span",
+        data: { moedict: "alt-reading-parent", altReadingType },
+        content: [
+          reading
+            ? [
+                youin,
+                {
+                  tag: "span",
+                  data: { moedict: "alt-reading-content" },
+                  content: reading,
+                },
+              ]
+            : youin,
+        ],
+      };
+    case "語音":
+    case "讀音":
+      return {
+        tag: "span",
+        data: { moedict: "alt-reading-parent", altReadingType },
+        content: {
+          tag: "span",
+          content: altReadingType,
+          data: { moedict: "alt-reading-label" },
+        },
+      };
+    default:
+      return "";
+  }
+}
+
+function getContent(contentRaw: string): StructuredContentNode {
+  const definitions = contentRaw.split("\n").map((definition) => {
+    let content: StructuredContentNode =
+      definition.match(/(^.*?(?=(\[例\])))|(^.*(?!(\[例\])))/g)?.at(0) ?? "";
+    const pos = content.match(/^.*(?=：\(\d\))|((?<=：)\(\d\)).*/g);
+    if (pos && pos.length === 2) {
+      const [posLabel, posContent] = pos;
+      content = [
+        {
+          tag: "span",
+          content: [posLabel, { tag: "br" }],
+          data: { moedict: "pos-label" },
+        },
+        {
+          tag: "span",
+          content: posContent,
+          data: { moedict: "pos-first-content" },
+        },
+      ] satisfies StructuredContentNode;
+    }
+    const example = definition.match(/(?<=\[例\]).*/g)?.at(0);
+    return {
+      tag: "div",
+      content: [
+        {
+          tag: "span",
+          content: content,
+          data: { moedict: "definition-entry-content" },
+        },
+        example
+          ? {
+              tag: "span",
+              content: [
+                {
+                  tag: "span",
+                  content: "例",
+                  data: { moedict: "definition-entry-example-label" },
+                },
+                {
+                  tag: "span",
+                  content: example,
+                  data: { moedict: "definition-entry-example-content" },
+                },
+              ],
+              data: { moedict: "definition-entry-example-parent" },
+            }
+          : "",
+      ],
+      data: { moedict: "definition-entry" },
+    };
+  }) satisfies StructuredContentNode[];
+  return {
+    tag: "div",
+    content: definitions,
+    data: { moedict: "meaning-parent" },
+  };
+}
+
+function getMeaning(meaningRaw: string, term: string): StructuredContentNode {
+  const parent = {
+    tag: "div",
+    content: [] as StructuredContentNode,
+    data: { moedict: "meanings-parent" },
+  } satisfies StructuredContentNode;
+  const poss = meaningRaw.match(/(?<=\[).*?(?=\]\n)/g);
+  const contents = meaningRaw.match(/\[*(?<=\]\n).*?((?=\[)|$)/gs);
+  if (poss?.length !== contents?.length)
+    throw new Error(`how?, ${meaningRaw}, term: ${term}`);
+  if (!poss || !contents || poss.length < 1) {
+    parent.content = getContent(meaningRaw);
+    return parent;
+  }
+  parent.content = {
+    tag: "div",
+    content: poss.map(
+      (pos, i) =>
+        ({
+          tag: "div",
+          content: [
+            { tag: "span", content: pos, data: { moedict: "pos-label" } },
+            {
+              tag: "div",
+              content: getContent(contents[i] ?? ""),
+              data: { moedict: "pos-content" },
+            },
+          ],
+          data: { moedict: "pos-entry-parent" },
+        } satisfies StructuredContentNode)
+    ),
+    data: { moedict: "pos-parent" },
+  } satisfies StructuredContentNode;
+  return parent;
+}
+
 export async function addTermsMoe(
   [zhuyinConcisedDic, pinyinConcisedDic, zhuyinRevisedDic, pinyinRevisedDic]: [
     Dictionary,
@@ -108,9 +263,11 @@ export async function addTermsMoe(
             // fixes words like "(1) ...　(2) ..." to be on separate lines (like 為, 于)
             .replace(/\(\d+\).*?(?=\()/g, (match) => {
               match = match.trim();
-              if (match.startsWith("(1")) match = "\n" + match;
+              // if (match.startsWith("(1")) match = "\n" + match;
               return match + "\n";
             });
+        } else if (["注音一式", "變體注音"].includes(key)) {
+          entry[key] = entry[key]?.replaceAll("\u3000", "");
         } else if (typeof entry[key] === "string") {
           entry[key] = entry[key].trim();
         }
@@ -129,20 +286,69 @@ export async function addTermsMoe(
         "變體類型 1:變 2:又音 3:語音 4:讀音": altReadingType,
       } = entry;
       const simplifiedTerm = simplifiedConverter.convertSync(term);
-      let adjustedTerm = `【${term}】`;
-      if (term !== simplifiedTerm) adjustedTerm += ` 【${simplifiedTerm}】`;
-      let additionalFieldsRow = "";
+      const termsParent: StructuredContentNode = {
+        tag: "span",
+        content: [],
+        data: { moedict: "terms-parent" },
+      };
+      (termsParent.content as StructuredContentNode[]).push({
+        tag: "span",
+        content: `${term}`,
+        data: { moedict: "traditional-term" },
+      });
+      if (term !== simplifiedTerm)
+        (termsParent.content as StructuredContentNode[]).push({
+          tag: "span",
+          content: `${simplifiedTerm}`,
+          data: { moedict: "simplified-term" },
+          lang: "zh-CN",
+        });
+      const additionalFieldsParent: StructuredContentNode = {
+        tag: "div",
+        content: [],
+        data: { moedict: "additional-fields-parent" },
+      };
       if (addSynonymsAntonyms) {
         if (synonyms) {
-          if (i === 1) additionalFieldsRow += "[似]";
-          additionalFieldsRow += synonyms;
+          const parentDiv: StructuredContentNode = {
+            tag: "div",
+            content: [],
+            data: { moedict: "synonyms-parent" },
+          };
+          (parentDiv.content as StructuredContentNode[]).push({
+            tag: "span",
+            content: "似",
+            data: { moedict: "synonyms-label" },
+          });
+          (parentDiv.content as StructuredContentNode[]).push({
+            tag: "span",
+            content: synonyms.replace("[似]", ""),
+            data: { moedict: "synonyms-content" },
+          });
+          (additionalFieldsParent.content as StructuredContentNode[]).push(
+            parentDiv
+          );
         }
         if (antonyms) {
-          if (additionalFieldsRow.length > 0) additionalFieldsRow += "\n";
-          if (i === 1) additionalFieldsRow += "[反]";
-          additionalFieldsRow += antonyms;
+          const parentDiv: StructuredContentNode = {
+            tag: "div",
+            content: [],
+            data: { moedict: "antonyms-parent" },
+          };
+          (parentDiv.content as StructuredContentNode[]).push({
+            tag: "span",
+            content: "反",
+            data: { moedict: "antonyms-label" },
+          });
+          (parentDiv.content as StructuredContentNode[]).push({
+            tag: "span",
+            content: antonyms.replace("[反]", ""),
+            data: { moedict: "antonyms-content" },
+          });
+          (additionalFieldsParent.content as StructuredContentNode[]).push(
+            parentDiv
+          );
         }
-        if (additionalFieldsRow.length > 0) additionalFieldsRow += "\n";
       }
       const [adjustedZhuyinReading, adjustedPinyinReading] =
         switchAltPronunciations && (altReadingType as AltReadingType) === "變"
@@ -162,39 +368,30 @@ export async function addTermsMoe(
                 : undefined,
             ]
           : [altZhuyinReading, altPinyinReading];
-      let altReading = "";
-      switch (altReadingType as AltReadingType) {
-        case "變":
-          altReading = `${
-            switchAltPronunciations ? "本音" : "變體注音"
-          }: 【${adjustedAltZhuyinReading}】`;
-          break;
-        case "又音":
-          altReading = adjustedAltZhuyinReading
-            ? `又音: 【${adjustedAltZhuyinReading}】`
-            : "又音";
-          break;
-        case "語音":
-        case "讀音":
-          altReading = altReadingType;
-          break;
-      }
+      const meaningElement = getMeaning(meaning, term);
       const contentZhuyin: StructuredContent = [
-        adjustedTerm,
-        altReading,
-        "\n",
-        additionalFieldsRow,
-        meaning,
+        termsParent,
+        getAltReadingContent(
+          altReadingType,
+          switchAltPronunciations,
+          adjustedAltZhuyinReading
+        ),
+        (additionalFieldsParent.content as StructuredContentNode[]).length > 0
+          ? additionalFieldsParent
+          : "",
+        meaningElement,
       ];
       const contentPinyin: StructuredContent = [
-        adjustedTerm,
-        altReading.replace(
-          `【${adjustedAltZhuyinReading}】`,
-          `【${adjustedAltPinyinReading}】`
+        termsParent,
+        getAltReadingContent(
+          altReadingType,
+          switchAltPronunciations,
+          adjustedAltPinyinReading
         ),
-        "\n",
-        additionalFieldsRow,
-        meaning,
+        (additionalFieldsParent.content as StructuredContentNode[]).length > 0
+          ? additionalFieldsParent
+          : "",
+        meaningElement,
       ];
       const entryId = (entry.字詞號 ?? "").trim();
       if (i === 0 && entryId && dataConcisedPicsIndex[entryId]) {
@@ -206,7 +403,7 @@ export async function addTermsMoe(
             tag: "details",
             style: { cursor: "pointer" },
             content: [
-              { tag: "summary", content: `圖片: ${title}`, lang: "zh-TW" },
+              { tag: "summary", content: `圖片: ${title}` },
               {
                 tag: "img",
                 path: "img/" + fileName,
@@ -225,14 +422,14 @@ export async function addTermsMoe(
         .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
         .addDetailedDefinition({
           type: "structured-content",
-          content: contentZhuyin,
+          content: { tag: "span", content: contentZhuyin, lang: "zh-TW" },
         });
       const pinyinTermEntry = new TermEntry(term)
         .setReading(adjustedPinyinReading ?? "")
         .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
         .addDetailedDefinition({
           type: "structured-content",
-          content: contentPinyin,
+          content: { tag: "span", content: contentPinyin, lang: "zh-TW" },
         });
 
       await Promise.all([

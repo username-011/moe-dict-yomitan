@@ -103,7 +103,12 @@ export async function addTermsLiangAn(
     const contentZhuyin: StructuredContent = [
       adjustedMeaning,
       mZhuyinReading && mZhuyinReading !== zhuyinReading
-        ? `大陸音讀: 【${mZhuyinReading}】`
+        ? {
+            tag: "span",
+            content: `大陸音讀: 【${mZhuyinReading}】`,
+            data: { type: "alt-reading" },
+            lang: "zh-TW",
+          }
         : "",
       additionalInfo,
       "\n",
@@ -112,7 +117,12 @@ export async function addTermsLiangAn(
     const contentPinyin: StructuredContent = [
       adjustedMeaning,
       mPinyinReading && mPinyinReading !== pinyinReading
-        ? `大陸漢拼: 【${mPinyinReading}】`
+        ? {
+            tag: "span",
+            content: `大陸漢拼: 【${mPinyinReading}】`,
+            data: { type: "alt-reading" },
+            lang: "zh-TW",
+          }
         : "",
       additionalInfo,
       "\n",
@@ -123,14 +133,14 @@ export async function addTermsLiangAn(
       .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
       .addDetailedDefinition({
         type: "structured-content",
-        content: contentZhuyin,
+        content: { tag: "span", content: contentZhuyin, lang: "zh-TW" },
       });
     const pinyinTermEntry = new TermEntry(termTrad)
       .setReading(pinyinReading ?? "")
       .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
       .addDetailedDefinition({
         type: "structured-content",
-        content: contentPinyin,
+        content: { tag: "span", content: contentPinyin, lang: "zh-TW" },
       });
     await Promise.all([
       liangAnDicZhuyin.addTerm(zhuyinTermEntry.build()),
