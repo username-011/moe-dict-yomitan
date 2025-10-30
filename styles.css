@@ -1,3 +1,5 @@
+font-family: sans-serif;
+
 [data-sc-moedict="terms-parent"] {
   vertical-align: middle;
 }
@@ -7,7 +9,6 @@
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
-  padding-block: 2px;
   font-size: 1.2em;
   margin-right: 6px;
 }
@@ -17,7 +18,6 @@
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
-  padding-block: 2px;
   font-size: 1.2em;
   margin-right: 6px;
 }
@@ -27,7 +27,6 @@
   border: 1px solid #454545;
   border-radius: 4px;
   vertical-align: middle;
-  padding-block: 2px;
 }
 [data-sc-moedict="alt-reading-label"] {
   border-right: 1px solid #454545;
@@ -44,13 +43,15 @@
   border-radius: 4px;
   margin-top: 2px;
 }
+[data-sc-moedict="synonyms-parent"] {
+  margin-bottom: 2px;
+}
 [data-sc-moedict="synonyms-label"] {
   background: #111;
   border: 1px solid #454545;
   border-radius: 4px;
   color: #71bafd;
   padding-inline: 4px;
-  padding-block: 2px;
   margin-right: 4px;
 }
 [data-sc-moedict="synonyms-content"] {
@@ -58,7 +59,6 @@
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
-  padding-block: 2px;
 }
 [data-sc-moedict="antonyms-label"] {
   background: #111;
@@ -66,7 +66,6 @@
   border-radius: 4px;
   color: #fd7171;
   padding-inline: 4px;
-  padding-block: 2px;
   margin-right: 4px;
 }
 [data-sc-moedict="antonyms-content"] {
@@ -74,7 +73,6 @@
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
-  padding-block: 2px;
 }
 [data-sc-moedict="pos-entry-parent"] {
   margin-top: 2px;
@@ -95,6 +93,7 @@
   padding-inline: 4px;
   padding-block: 2px;
   color: white;
+  font-family: Helvetica;
 }
 [data-sc-moedict="definition-entry-example-content"] {
   color: #c39393;
