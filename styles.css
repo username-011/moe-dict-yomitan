@@ -1,13 +1,10 @@
---background: #111;
---border: 1px solid #454545;
-
 [data-sc-moedict="terms-parent"] {
   vertical-align: middle;
 }
 [data-sc-moedict="traditional-term"] {
-  background: var(--background);
+  background: #111;
   color: #e42566;
-  border: var(--border);
+  border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
   padding-block: 2px;
@@ -15,9 +12,9 @@
   margin-right: 6px;
 }
 [data-sc-moedict="simplified-term"] {
-  background: var(--background);
+  background: #111;
   color: #257de4;
-  border: var(--border);
+  border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
   padding-block: 2px;
@@ -25,15 +22,15 @@
   margin-right: 6px;
 }
 [data-sc-moedict="alt-reading-parent"] {
-  background: var(--background);
+  background: #111;
   font-size: 1.2em;
-  border: var(--border);
+  border: 1px solid #454545;
   border-radius: 4px;
   vertical-align: middle;
   padding-block: 2px;
 }
 [data-sc-moedict="alt-reading-label"] {
-  border-right: var(--border);
+  border-right: 1px solid #454545;
   padding-inline: 4px;
   color: #ababab;
 }
@@ -48,8 +45,8 @@
   margin-top: 2px;
 }
 [data-sc-moedict="synonyms-label"] {
-  background: var(--background);
-  border: var(--border);
+  background: #111;
+  border: 1px solid #454545;
   border-radius: 4px;
   color: #71bafd;
   padding-inline: 4px;
@@ -57,15 +54,15 @@
   margin-right: 4px;
 }
 [data-sc-moedict="synonyms-content"] {
-  background: var(--background);
-  border: var(--border);
+  background: #111;
+  border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
   padding-block: 2px;
 }
 [data-sc-moedict="antonyms-label"] {
-  background: var(--background);
-  border: var(--border);
+  background: #111;
+  border: 1px solid #454545;
   border-radius: 4px;
   color: #fd7171;
   padding-inline: 4px;
@@ -73,8 +70,8 @@
   margin-right: 4px;
 }
 [data-sc-moedict="antonyms-content"] {
-  background: var(--background);
-  border: var(--border);
+  background: #111;
+  border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
   padding-block: 2px;
@@ -83,8 +80,8 @@
   margin-top: 2px;
 }
 [data-sc-moedict="pos-label"] {
-  background: var(--background);
-  border: var(--border);
+  background: #111;
+  border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
   padding-block: 2px;
@@ -93,7 +90,7 @@
 [data-sc-moedict="definition-entry-example-label"] {
   margin-inline: 4px;
   background: #522323;
-  border: var(--border);
+  border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
   padding-block: 2px;
