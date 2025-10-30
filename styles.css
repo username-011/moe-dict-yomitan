@@ -102,3 +102,40 @@
 [data-sc-moedict="meanings-parent"] {
   margin-top: 2px;
 }
+
+[data-theme="light"] {
+  :is(
+      [data-sc-moedict="traditional-term"],
+      [data-sc-moedict="simplified-term"],
+      [data-sc-moedict="alt-reading-parent"],
+      [data-sc-moedict="synonyms-label"],
+      [data-sc-moedict="synonyms-content"],
+      [data-sc-moedict="antonyms-label"],
+      [data-sc-moedict="antonyms-content"],
+      [data-sc-moedict="pos-label"]
+    ) {
+    background: #f9f9f9;
+  }
+  [data-sc-moedict="pos-label"] {
+    color: black;
+  }
+  [data-sc-moedict="alt-reading-label"] {
+    color: #7c7c7c;
+  }
+  [data-sc-moedict="synonyms-label"] {
+    color: #57aaf7;
+  }
+  [data-sc-moedict="antonyms-label"] {
+    color: #fe7575;
+  }
+  [data-sc-moedict="definition-entry-example-content"] {
+    color: #9b6969;
+  }
+  [data-sc-moedict="alt-reading-content"] {
+    color: #b8a92a;
+  }
+  [data-sc-moedict="definition-entry-example-label"] {
+    background: #faf0f0;
+    color: #773636;
+  }
+}
