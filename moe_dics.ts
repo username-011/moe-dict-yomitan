@@ -167,7 +167,7 @@ function getMeaning(meaningRaw: string, term: string): StructuredContentNode {
     data: { moedict: "meanings-parent" },
   } satisfies StructuredContentNode;
   const poss = meaningRaw.match(/(?<=\[).*?(?=\]\n)/g);
-  const contents = meaningRaw.match(/\[*(?<=\]\n).*?((?=\[)|$)/gs);
+  const contents = meaningRaw.match(/(?<=\[.\]\n).*?((?=\[)|$)/gs);
   if (poss?.length !== contents?.length)
     throw new Error(`how?, ${meaningRaw}, term: ${term}`);
   if (!poss || !contents || poss.length < 1) {
