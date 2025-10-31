@@ -1,7 +1,7 @@
 font-family: Helvetica;
 
 [data-sc-moedict="terms-parent"] {
-  vertical-align: middle;
+  vertical-align: bottom;
 }
 [data-sc-moedict="traditional-term"] {
   background: #111;
@@ -10,7 +10,7 @@ font-family: Helvetica;
   border-radius: 4px;
   padding-inline: 4px;
   padding-block: 2px;
-  font-size: 1.2em;
+  font-size: 1.1em;
   margin-right: 6px;
 }
 [data-sc-moedict="simplified-term"] {
@@ -20,16 +20,16 @@ font-family: Helvetica;
   border-radius: 4px;
   padding-inline: 4px;
   padding-block: 2px;
-  font-size: 1.2em;
+  font-size: 1.1em;
   margin-right: 6px;
 }
 [data-sc-moedict="alt-reading-parent"] {
   background: #111;
-  font-size: 1.2em;
+  font-size: 1.1em;
   border: 1px solid #454545;
   border-radius: 4px;
-  vertical-align: middle;
   padding-block: 2px;
+  vertical-align: bottom;
 }
 [data-sc-moedict="alt-reading-label"] {
   border-right: 1px solid #454545;
@@ -115,12 +115,12 @@ font-family: Helvetica;
 
 [data-sc-moedict="mainland-reading-parent"] {
   background: #111;
-  font-size: 1.2em;
+  font-size: 1.1em;
   border: 1px solid #454545;
   border-radius: 4px;
-  vertical-align: middle;
   padding-block: 2px;
   margin-right: 6px;
+  vertical-align: bottom;
 }
 [data-sc-moedict="mainland-reading-label"] {
   border-right: 1px solid #454545;
@@ -134,12 +134,12 @@ font-family: Helvetica;
 
 [data-sc-moedict="word-belong-parent"] {
   background: #111;
-  font-size: 1.2em;
+  font-size: 1.1em;
   border: 1px solid #454545;
   border-radius: 4px;
-  vertical-align: middle;
   padding-block: 2px;
   margin-right: 6px;
+  vertical-align: bottom;
 }
 [data-sc-moedict="word-belong-label"] {
   border-right: 1px solid #454545;
@@ -152,12 +152,12 @@ font-family: Helvetica;
 
 [data-sc-moedict="sound-belong-parent"] {
   background: #111;
-  font-size: 1.2em;
+  font-size: 1.1em;
   border: 1px solid #454545;
   border-radius: 4px;
-  vertical-align: middle;
   padding-block: 2px;
   margin-right: 6px;
+  vertical-align: bottom;
 }
 [data-sc-moedict="sound-belong-label"] {
   border-right: 1px solid #454545;
