@@ -43,6 +43,112 @@ type LiangAnEntry = Record<string, string | undefined> &
     [K in Meanings]?: string;
   };
 
+function getContent(contentRow: string, term: string): StructuredContentNode {
+  let content: StructuredContentNode =
+    contentRow.match(/(^.*?(?=(\[例\])))|(^.*(?!(\[例\])))/g)?.at(0) ?? "";
+  const pos = contentRow.match(/^\d\..*(?=：$)/g);
+  if (pos && pos.length === 1) {
+    const [posLabel] = pos;
+    content = [
+      {
+        tag: "span",
+        content: [posLabel, { tag: "br" }],
+        data: { moedict: "pos-label" },
+      },
+    ] satisfies StructuredContentNode;
+  }
+  const example = contentRow.match(/(?<=\[例\]).*/g)?.at(0);
+  return {
+    tag: "div",
+    content: [
+      {
+        tag: "span",
+        content: content,
+        data: { moedict: "definition-entry-content" },
+      },
+      example
+        ? {
+            tag: "span",
+            content: [
+              {
+                tag: "span",
+                content: "例",
+                data: { moedict: "definition-entry-example-label" },
+              },
+              {
+                tag: "span",
+                content: example.replaceAll("～", term),
+                data: { moedict: "definition-entry-example-content" },
+              },
+            ],
+            data: { moedict: "definition-entry-example-parent" },
+          }
+        : "",
+    ],
+    data: { moedict: "definition-entry" },
+  };
+}
+
+function getAdditionalInfo(
+  altReading?: string,
+  taiwanOrChinaTerm?: string,
+  taiwanOrChinaReading?: string
+): StructuredContentNode[] {
+  const info = [] as StructuredContentNode[];
+  altReading &&
+    info.push({
+      tag: "span",
+      content: [
+        {
+          tag: "span",
+          content: "大陸音讀",
+          data: { moedict: "mainland-reading-label" },
+        },
+        {
+          tag: "span",
+          content: altReading,
+          data: { moedict: "mainland-reading-content" },
+        },
+      ],
+      data: { moedict: "mainland-reading-parent", altReadingType: "大陸音讀" },
+    });
+  taiwanOrChinaTerm &&
+    info.push({
+      tag: "span",
+      content: [
+        {
+          tag: "span",
+          content: `詞`,
+          data: { moedict: "word-belong-label" },
+        },
+        {
+          tag: "span",
+          content: taiwanOrChinaTerm,
+          data: { moedict: "word-belong-content" },
+        },
+      ],
+      data: { moedict: "word-belong-parent" },
+    });
+  taiwanOrChinaReading &&
+    info.push({
+      tag: "span",
+      content: [
+        {
+          tag: "span",
+          content: `音`,
+          data: { moedict: "sound-belong-label" },
+        },
+        {
+          tag: "span",
+          content: taiwanOrChinaReading,
+          data: { moedict: "sound-belong-content" },
+        },
+      ],
+      data: { moedict: "sound-belong-parent" },
+    });
+  return info;
+}
+
 export async function addTermsLiangAn(
   [liangAnDicZhuyin, liangAnDicPinyin]: [Dictionary, Dictionary],
   path: string,
@@ -61,6 +167,8 @@ export async function addTermsLiangAn(
       // some keys have "丨" in them (supposed to be used in vertical text, but we use horizontal text)
       if (["臺灣音讀", "大陸音讀"].includes(key) || key.startsWith("釋義")) {
         entry[key] = (entry[key] ?? "").replaceAll("丨", "ㄧ");
+        if (["臺灣音讀", "大陸音讀"].includes(key))
+          entry[key] = entry[key].replaceAll("\u3000", "");
       }
       // not all keys have trimming so maybe apply it just in case
       if (typeof entry[key] === "string") {
@@ -80,53 +188,71 @@ export async function addTermsLiangAn(
       "臺／陸特有音": taiwanOrChinaReading,
       音序: order,
     } = entry;
-    let adjustedMeaning = `【${termTrad}】`;
+    const termsParent: StructuredContentNode = {
+      tag: "span",
+      content: [],
+      data: { moedict: "terms-parent" },
+    };
+    (termsParent.content as StructuredContentNode[]).push({
+      tag: "span",
+      content: `${termTrad}`,
+      data: { moedict: "traditional-term" },
+    });
     if (!!termSimpl && termTrad !== termSimpl)
-      adjustedMeaning += ` 【${termSimpl}】`;
-    const meanings: StructuredContentNode[] = [];
+      (termsParent.content as StructuredContentNode[]).push({
+        tag: "span",
+        content: `${termSimpl}`,
+        data: { moedict: "simplified-term" },
+        lang: "zh-CN",
+      });
+    const meaningsParent = {
+      tag: "div",
+      content: [] as StructuredContentNode[],
+      data: { moedict: "meanings-parent" },
+    } satisfies StructuredContentNode;
     for (let i = 1; i <= 30; i++) {
       const meaning = entry[`釋義${i}`] as string | undefined;
       if (meaning) {
         meaning.includes("<table")
-          ? meanings.push(parse_html(meaning))
-          : meanings.push(`${meaning}\n`);
+          ? meaningsParent.content.push(parse_html(meaning))
+          : meaningsParent.content.push(getContent(meaning, termTrad));
       } else {
         break;
       }
     }
-    let additionalInfo = "";
-    if (addMainlandTWDistinctions) {
-      if (taiwanOrChinaTerm) additionalInfo += `詞: ${taiwanOrChinaTerm} `;
-      if (taiwanOrChinaReading) additionalInfo += `音: ${taiwanOrChinaReading}`;
-      if (additionalInfo.length > 0) additionalInfo = " " + additionalInfo;
-    }
     const contentZhuyin: StructuredContent = [
-      adjustedMeaning,
-      mZhuyinReading && mZhuyinReading !== zhuyinReading
-        ? {
-            tag: "span",
-            content: `大陸音讀: 【${mZhuyinReading}】`,
-            data: { type: "alt-reading" },
-            lang: "zh-TW",
-          }
-        : "",
-      additionalInfo,
-      "\n",
-      meanings,
+      {
+        tag: "span",
+        content: [
+          termsParent,
+          getAdditionalInfo(
+            mZhuyinReading && mZhuyinReading !== zhuyinReading
+              ? mZhuyinReading
+              : undefined,
+            taiwanOrChinaTerm,
+            taiwanOrChinaReading
+          ),
+        ],
+        data: { moedict: "first-row-parent" },
+      },
+      meaningsParent,
     ];
     const contentPinyin: StructuredContent = [
-      adjustedMeaning,
-      mPinyinReading && mPinyinReading !== pinyinReading
-        ? {
-            tag: "span",
-            content: `大陸漢拼: 【${mPinyinReading}】`,
-            data: { type: "alt-reading" },
-            lang: "zh-TW",
-          }
-        : "",
-      additionalInfo,
-      "\n",
-      meanings,
+      {
+        tag: "span",
+        content: [
+          termsParent,
+          getAdditionalInfo(
+            mPinyinReading && mPinyinReading !== pinyinReading
+              ? mPinyinReading
+              : undefined,
+            taiwanOrChinaTerm,
+            taiwanOrChinaReading
+          ),
+        ],
+        data: { moedict: "first-row-parent" },
+      },
+      meaningsParent,
     ];
     const zhuyinTermEntry = new TermEntry(termTrad)
       .setReading(zhuyinReading)

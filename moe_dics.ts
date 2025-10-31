@@ -370,24 +370,36 @@ export async function addTermsMoe(
           : [altZhuyinReading, altPinyinReading];
       const meaningElement = getMeaning(meaning, term);
       const contentZhuyin: StructuredContent = [
-        termsParent,
-        getAltReadingContent(
-          altReadingType,
-          switchAltPronunciations,
-          adjustedAltZhuyinReading
-        ),
+        {
+          tag: "span",
+          content: [
+            termsParent,
+            getAltReadingContent(
+              altReadingType,
+              switchAltPronunciations,
+              adjustedAltZhuyinReading
+            ),
+          ],
+          data: { moedict: "first-row-parent" },
+        },
         (additionalFieldsParent.content as StructuredContentNode[]).length > 0
           ? additionalFieldsParent
           : "",
         meaningElement,
       ];
       const contentPinyin: StructuredContent = [
-        termsParent,
-        getAltReadingContent(
-          altReadingType,
-          switchAltPronunciations,
-          adjustedAltPinyinReading
-        ),
+        {
+          tag: "span",
+          content: [
+            termsParent,
+            getAltReadingContent(
+              altReadingType,
+              switchAltPronunciations,
+              adjustedAltPinyinReading
+            ),
+          ],
+          data: { moedict: "first-row-parent" },
+        },
         (additionalFieldsParent.content as StructuredContentNode[]).length > 0
           ? additionalFieldsParent
           : "",

@@ -39,7 +39,7 @@ font-family: Helvetica;
 [data-sc-moedict="alt-reading-content"] {
   color: #ddcd4b;
   padding-inline: 4px;
-  font-family: sans-serif;
+  font-family: "Noto Sans CJK TC", sans-serif;
 }
 [data-sc-moedict="additional-fields-parent"] {
   padding-inline: 4px;
@@ -103,7 +103,68 @@ font-family: Helvetica;
 }
 [data-sc-moedict="definition-entry-example-content"] {
   color: #c39393;
+  font-family: "Noto Sans CJK TC", sans-serif;
 }
 [data-sc-moedict="meanings-parent"] {
   margin-top: 2px;
+  margin-bottom: 2px;
+}
+[data-sc-moedict="definition-entry-content"] {
+  font-family: "Noto Sans CJK TC", sans-serif;
+}
+
+[data-sc-moedict="mainland-reading-parent"] {
+  background: #111;
+  font-size: 1.2em;
+  border: 1px solid #454545;
+  border-radius: 4px;
+  vertical-align: middle;
+  padding-block: 2px;
+  margin-right: 6px;
+}
+[data-sc-moedict="mainland-reading-label"] {
+  border-right: 1px solid #454545;
+  padding-inline: 4px;
+  color: #ababab;
+}
+[data-sc-moedict="mainland-reading-content"] {
+  padding-inline: 4px;
+  font-family: "Noto Sans CJK TC", sans-serif;
+}
+
+[data-sc-moedict="word-belong-parent"] {
+  background: #111;
+  font-size: 1.2em;
+  border: 1px solid #454545;
+  border-radius: 4px;
+  vertical-align: middle;
+  padding-block: 2px;
+  margin-right: 6px;
+}
+[data-sc-moedict="word-belong-label"] {
+  border-right: 1px solid #454545;
+  padding-inline: 4px;
+  color: #ababab;
+}
+[data-sc-moedict="word-belong-content"] {
+  padding-inline: 4px;
+}
+
+[data-sc-moedict="sound-belong-parent"] {
+  background: #111;
+  font-size: 1.2em;
+  border: 1px solid #454545;
+  border-radius: 4px;
+  vertical-align: middle;
+  padding-block: 2px;
+  margin-right: 6px;
+}
+[data-sc-moedict="sound-belong-label"] {
+  border-right: 1px solid #454545;
+  padding-inline: 4px;
+  color: #ababab;
+}
+[data-sc-moedict="sound-belong-content"] {
+  padding-inline: 4px;
+  font-family: "Noto Sans CJK TC", sans-serif;
 }

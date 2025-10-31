@@ -65,13 +65,9 @@ function add(node: ChildNode): StructuredContentNode {
     case "tfoot":
     case "tr":
       return {
-        tag: node.nodeName.toLowerCase() as
-          | "table"
-          | "tbody"
-          | "thead"
-          | "tfoot"
-          | "tr",
+        tag: node.nodeName,
         content: Array.from(node.childNodes).map((c) => add(c)),
+        data: { moedict: `table-${node.nodeName}` },
         lang: "zh-TW",
       };
     case "td":
@@ -80,6 +76,7 @@ function add(node: ChildNode): StructuredContentNode {
         tag: node.nodeName.toLowerCase() as "td" | "th",
         content: Array.from(node.childNodes).map((c) => add(c)),
         style: parseStyle((node as Element).getAttribute("style") || ""),
+        data: { moedict: `table-${node.nodeName}` },
         lang: "zh-TW",
       };
     default:
@@ -92,9 +89,13 @@ export default function parse_html(data: string): StructuredContent {
     `<span>${data}</span>`,
     "text/html"
   );
-  const content: StructuredContent = [];
+  const content: StructuredContentNode = {
+    tag: "div",
+    content: [],
+    data: { moedict: "meaning-parent" },
+  };
   Array.from(doc.childNodes.item(0).childNodes).forEach((node) => {
-    content.push(add(node));
+    (content.content as StructuredContentNode[]).push(add(node));
   });
-  return content.filter((item) => item !== "");
+  return content;
 }
