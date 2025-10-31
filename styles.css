@@ -1,4 +1,4 @@
-font-family: sans-serif;
+font-family: Helvetica;
 
 [data-sc-moedict="terms-parent"] {
   vertical-align: middle;
@@ -9,6 +9,7 @@ font-family: sans-serif;
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
+  padding-block: 2px;
   font-size: 1.2em;
   margin-right: 6px;
 }
@@ -18,6 +19,7 @@ font-family: sans-serif;
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
+  padding-block: 2px;
   font-size: 1.2em;
   margin-right: 6px;
 }
@@ -27,6 +29,7 @@ font-family: sans-serif;
   border: 1px solid #454545;
   border-radius: 4px;
   vertical-align: middle;
+  padding-block: 2px;
 }
 [data-sc-moedict="alt-reading-label"] {
   border-right: 1px solid #454545;
@@ -52,6 +55,7 @@ font-family: sans-serif;
   border-radius: 4px;
   color: #71bafd;
   padding-inline: 4px;
+  padding-block: 2px;
   margin-right: 4px;
 }
 [data-sc-moedict="synonyms-content"] {
@@ -59,6 +63,7 @@ font-family: sans-serif;
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
+  padding-block: 2px;
 }
 [data-sc-moedict="antonyms-label"] {
   background: #111;
@@ -66,6 +71,7 @@ font-family: sans-serif;
   border-radius: 4px;
   color: #fd7171;
   padding-inline: 4px;
+  padding-block: 2px;
   margin-right: 4px;
 }
 [data-sc-moedict="antonyms-content"] {
@@ -73,6 +79,7 @@ font-family: sans-serif;
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
+  padding-block: 2px;
 }
 [data-sc-moedict="pos-entry-parent"] {
   margin-top: 2px;
@@ -82,6 +89,7 @@ font-family: sans-serif;
   border: 1px solid #454545;
   border-radius: 4px;
   padding-inline: 4px;
+  padding-block: 2px;
   color: white;
 }
 [data-sc-moedict="definition-entry-example-label"] {
@@ -92,7 +100,6 @@ font-family: sans-serif;
   padding-inline: 4px;
   padding-block: 2px;
   color: white;
-  font-family: Helvetica;
 }
 [data-sc-moedict="definition-entry-example-content"] {
   color: #c39393;
