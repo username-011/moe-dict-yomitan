@@ -159,7 +159,7 @@ font-family: sans-serif;
   border-radius: 4px;
   margin-right: 6px;
   vertical-align: bottom;
-  padding-inline: 4px;
+  padding: 4px;
 }
 [data-sc-moedict="word-belong-label"] {
   border-right: 1px solid #454545;
@@ -179,7 +179,7 @@ font-family: sans-serif;
   border-radius: 4px;
   margin-right: 6px;
   vertical-align: bottom;
-  padding-inline: 4px;
+  padding: 4px;
 }
 [data-sc-moedict="sound-belong-label"] {
   border-right: 1px solid #454545;
