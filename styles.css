@@ -19,6 +19,7 @@ font-family: sans-serif;
   padding: 4px;
   font-size: 1.1em;
   margin-right: 6px;
+  vertical-align: bottom;
 }
 [data-sc-moedict="simplified-term"] {
   display: inline-block;
@@ -30,6 +31,7 @@ font-family: sans-serif;
   padding: 4px;
   font-size: 1.1em;
   margin-right: 6px;
+  vertical-align: bottom;
 }
 [data-sc-moedict="alt-reading-parent"] {
   display: inline-block;
