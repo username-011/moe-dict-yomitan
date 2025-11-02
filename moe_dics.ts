@@ -112,12 +112,12 @@ function getContent(contentRaw: string): StructuredContentNode {
       content = [
         {
           tag: "span",
-          content: [posLabel, { tag: "br" }],
+          content: posLabel,
           data: { moedict: "pos-label" },
         },
         {
           tag: "span",
-          content: posContent,
+          content: [{ tag: "br" }, posContent ?? ""],
           data: { moedict: "pos-first-content" },
         },
       ] satisfies StructuredContentNode;
