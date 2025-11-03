@@ -4,7 +4,7 @@ and even though it will render the same CJK font, by setting font-family to sans
 it resets the Helvetica fallback and triggers my PC to render Noto Sans CJK TC preferably, which has much more acceptable Zhuyin display
 for tone characters like "ˊ" or "ˋ" 
 */
-font-family: sans-serif;
+font-family: "Noto Sans CJK TC", sans-serif;
 
 [data-sc-moedict="terms-parent"] {
   vertical-align: bottom;
@@ -44,8 +44,12 @@ font-family: sans-serif;
   padding: 4px;
 }
 [data-sc-moedict="alt-reading-label"] {
-  border-right: 1px solid #454545;
   color: #ababab;
+}
+[data-sc-moedict="alt-reading-label"]:has(
+    + [data-sc-moedict="alt-reading-label"]
+  ) {
+  border-right: 1px solid #454545;
   padding-right: 4px;
 }
 [data-sc-moedict="alt-reading-content"] {
