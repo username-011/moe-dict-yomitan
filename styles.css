@@ -113,6 +113,9 @@ font-family: sans-serif;
   ) {
   margin-bottom: 2px;
 }
+[data-sc-moedict="definition-entry-example-parent"][data-sc-type="書"] {
+  display: block;
+}
 [data-sc-moedict="definition-entry-example-label"] {
   display: inline-block;
   line-height: 1;

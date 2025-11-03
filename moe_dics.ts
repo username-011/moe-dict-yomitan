@@ -102,10 +102,62 @@ function getAltReadingContent(
   }
 }
 
-function getContent(contentRaw: string): StructuredContentNode {
+function getExample(
+  label: string,
+  content: string,
+  dic: "Concised" | "Revised"
+) {
+  return {
+    tag: "span",
+    content: [
+      {
+        tag: "span",
+        content: label,
+        data: { moedict: "definition-entry-example-label" },
+      },
+      {
+        tag: "span",
+        content,
+        data: { moedict: "definition-entry-example-content" },
+      },
+    ],
+    data: {
+      moedict: "definition-entry-example-parent",
+      type: dic === "Concised" || label === "如" ? "例" : "書",
+    },
+  } as StructuredContentNode;
+}
+
+const revisedExampleSentencesPattern =
+  /。[^\n。」]*?：[「〈].*?[」〉](?:、?[「〈].*?[」〉])*/g;
+function getContent(
+  contentRaw: string,
+  dic: "Concised" | "Revised"
+): StructuredContentNode {
   const definitions = contentRaw.split("\n").map((definition) => {
+    const examples = [] as StructuredContentNode[];
+    let adjustedDefinition = definition;
+    if (dic === "Revised") {
+      let matches: RegExpMatchArray | null = null;
+      while (
+        (matches = adjustedDefinition.match(revisedExampleSentencesPattern)) !==
+        null
+      ) {
+        matches?.forEach((match) => {
+          const adjusted = match.replace("。", "");
+          const split = adjusted.split("：");
+          const [label, content] = [split[0]!, split.slice(1).join("：")];
+          const example = getExample(label, content, "Revised");
+          label === "如" ? examples.unshift(example) : examples.push(example);
+          adjustedDefinition = adjustedDefinition.replace(match, "。");
+        });
+        adjustedDefinition = adjustedDefinition.replace("。。", "。");
+      }
+    }
     let content: StructuredContentNode =
-      definition.match(/(^.*?(?=(\[例\])))|(^.*(?!(\[例\])))/g)?.at(0) ?? "";
+      adjustedDefinition
+        .match(/(^.*?(?=(\[例\])))|(^.*(?!(\[例\])))/g)
+        ?.at(0) ?? "";
     const pos = content.match(/^.*(?=：\(\d\))|((?<=：)\(\d\)).*/g);
     if (pos && pos.length === 2) {
       const [posLabel, posContent] = pos;
@@ -122,33 +174,23 @@ function getContent(contentRaw: string): StructuredContentNode {
         },
       ] satisfies StructuredContentNode;
     }
-    const example = definition.match(/(?<=\[例\]).*/g)?.at(0);
+    if (dic === "Concised")
+      examples.push(
+        getExample(
+          "例",
+          adjustedDefinition.match(/(?<=\[例\]).*/g)?.at(0) ?? "",
+          "Concised"
+        )
+      );
     return {
       tag: "div",
       content: [
         {
           tag: "span",
-          content: content,
+          content,
           data: { moedict: "definition-entry-content" },
         },
-        example
-          ? {
-              tag: "span",
-              content: [
-                {
-                  tag: "span",
-                  content: "例",
-                  data: { moedict: "definition-entry-example-label" },
-                },
-                {
-                  tag: "span",
-                  content: example,
-                  data: { moedict: "definition-entry-example-content" },
-                },
-              ],
-              data: { moedict: "definition-entry-example-parent" },
-            }
-          : "",
+        examples,
       ],
       data: { moedict: "definition-entry" },
     };
@@ -160,7 +202,11 @@ function getContent(contentRaw: string): StructuredContentNode {
   };
 }
 
-function getMeaning(meaningRaw: string, term: string): StructuredContentNode {
+function getMeaning(
+  meaningRaw: string,
+  term: string,
+  dic: "Concised" | "Revised"
+): StructuredContentNode {
   const parent = {
     tag: "div",
     content: [] as StructuredContentNode,
@@ -171,7 +217,7 @@ function getMeaning(meaningRaw: string, term: string): StructuredContentNode {
   if (poss?.length !== contents?.length)
     throw new Error(`how?, ${meaningRaw}, term: ${term}`);
   if (!poss || !contents || poss.length < 1) {
-    parent.content = getContent(meaningRaw);
+    parent.content = getContent(meaningRaw, dic);
     return parent;
   }
   parent.content = {
@@ -184,7 +230,7 @@ function getMeaning(meaningRaw: string, term: string): StructuredContentNode {
             { tag: "span", content: pos, data: { moedict: "pos-label" } },
             {
               tag: "div",
-              content: getContent(contents[i] ?? ""),
+              content: getContent(contents[i] ?? "", dic),
               data: { moedict: "pos-content" },
             },
           ],
@@ -368,7 +414,11 @@ export async function addTermsMoe(
                 : undefined,
             ]
           : [altZhuyinReading, altPinyinReading];
-      const meaningElement = getMeaning(meaning, term);
+      const meaningElement = getMeaning(
+        meaning,
+        term,
+        i === 0 ? "Concised" : "Revised"
+      );
       const contentZhuyin: StructuredContent = [
         {
           tag: "span",

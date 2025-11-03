@@ -126,7 +126,7 @@ export async function initDics(): Promise<
   await zhuyinRevisedDic.setIndex(
     zhuyinIndexConcised
       .setTitle("重編國語辭典修訂本 注音")
-      .setRevision("2025/11/02b")
+      .setRevision("2025/11/03")
       .setDescription(
         "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
       )
@@ -145,7 +145,7 @@ export async function initDics(): Promise<
   await pinyinRevisedDic.setIndex(
     pinyinIndexConcised
       .setTitle("重編國語辭典修訂本 拼音")
-      .setRevision("2025/11/02b")
+      .setRevision("2025/11/03")
       .setDescription(
         "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
       )
