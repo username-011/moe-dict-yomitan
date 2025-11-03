@@ -173,14 +173,10 @@ function getContent(
         },
       ] satisfies StructuredContentNode;
     }
-    if (dic === "Concised")
-      examples.push(
-        getExample(
-          "例",
-          adjustedDefinition.match(/(?<=\[例\]).*/g)?.at(0) ?? "",
-          "Concised"
-        )
-      );
+    if (dic === "Concised") {
+      const match = adjustedDefinition.match(/(?<=\[例\]).*/g)?.at(0);
+      match && examples.push(getExample("例", match, "Concised"));
+    }
     return {
       tag: "div",
       content: [

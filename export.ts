@@ -81,7 +81,7 @@ export async function initDics(): Promise<
   });
   const zhuyinIndexConcised = new DictionaryIndex()
     .setTitle("國語辭典簡編本 注音")
-    .setRevision("2025/11/03b")
+    .setRevision("2025/11/03c")
     .setAuthor("shadow")
     .setAttribution("國語辭典簡編本 (2014)")
     .setDescription(
@@ -98,7 +98,7 @@ export async function initDics(): Promise<
   zhuyinIndexConcised.index.targetLanguage = "zh";
   const pinyinIndexConcised = new DictionaryIndex()
     .setTitle("國語辭典簡編本 拼音")
-    .setRevision("2025/11/03b")
+    .setRevision("2025/11/03c")
     .setAuthor("shadow")
     .setAttribution("國語辭典簡編本 (2014)")
     .setDescription(
