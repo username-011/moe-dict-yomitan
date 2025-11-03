@@ -128,8 +128,6 @@ function getExample(
   } as StructuredContentNode;
 }
 
-const revisedExampleSentencesPattern =
-  /。[^\n。」]*?：[「〈].*?[」〉](?:、?[「〈].*?[」〉])*/g;
 function getContent(
   contentRaw: string,
   dic: "Concised" | "Revised"
@@ -140,8 +138,9 @@ function getContent(
     if (dic === "Revised") {
       let matches: RegExpMatchArray | null = null;
       while (
-        (matches = adjustedDefinition.match(revisedExampleSentencesPattern)) !==
-        null
+        (matches = adjustedDefinition.match(
+          /。[^\n。」]*?：[「〈].*?[」〉](?:、?[「〈].*?[」〉])*/g
+        )) !== null
       ) {
         matches?.forEach((match) => {
           const adjusted = match.replace("。", "");
