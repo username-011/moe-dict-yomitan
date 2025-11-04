@@ -170,7 +170,7 @@ export async function initDics(): Promise<
   });
   const zhuyinIndexLiangAn = new DictionaryIndex()
     .setTitle("兩岸詞典 注音")
-    .setRevision("2025/11/03b")
+    .setRevision("2025/11/05")
     .setAuthor("shadow")
     .setAttribution("兩岸詞典 (2015)")
     .setDescription("A monolingual dictionary of Mandarin Chinese.")
@@ -185,7 +185,7 @@ export async function initDics(): Promise<
   zhuyinIndexLiangAn.index.targetLanguage = "zh";
   const pinyinIndexLiangAn = new DictionaryIndex()
     .setTitle("兩岸詞典 拼音")
-    .setRevision("2025/11/03b")
+    .setRevision("2025/11/05")
     .setAuthor("shadow")
     .setAttribution("兩岸詞典 (2015)")
     .setDescription("A monolingual dictionary of Mandarin Chinese.")

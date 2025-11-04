@@ -77,7 +77,7 @@ function getContent(contentRow: string, term: string): StructuredContentNode {
               },
               {
                 tag: "span",
-                content: example.replaceAll("～", term),
+                content: example.replace(/[〜～]/g, term),
                 data: { moedict: "definition-entry-example-content" },
               },
             ],
