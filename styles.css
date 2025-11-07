@@ -47,7 +47,7 @@ font-family: "Noto Sans CJK TC", sans-serif;
   color: #ababab;
 }
 [data-sc-moedict="alt-reading-label"]:has(
-    + [data-sc-moedict="alt-reading-label"]
+    + [data-sc-moedict="alt-reading-content"]
   ) {
   border-right: 1px solid #454545;
   padding-right: 4px;
