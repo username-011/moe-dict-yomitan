@@ -27,5 +27,9 @@
     "noPropertyAccessFromIndexSignature": false,
 
     "esModuleInterop": true
+  },
+  "ts-node": {
+    "experimentalSpecifierResolution": "node",
+    "esm": true
   }
 }
