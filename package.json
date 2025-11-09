@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/node": "24.2.0"
+    "@types/node": "24.2.0",
+    "ts-node": "^10.9.2"
   },
   "peerDependencies": {
     "typescript": "^5"
