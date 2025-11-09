@@ -1,0 +1,30 @@
+name: Build&release dictionaries
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Build
+      run: |
+        npm install
+        npx ts-node .\export.ts
+
+    - name: Publish
+      uses: softprops/action-gh-release@v2
+      with:
+        files: build/*
+        token: ${{ secrets.GITHUB_TOKEN }}
+        generate_release_notes: true
