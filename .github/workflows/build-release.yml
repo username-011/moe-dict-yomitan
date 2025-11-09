@@ -20,7 +20,7 @@ jobs:
     - name: Build
       run: |
         npm install
-        npx ts-node ./export.ts
+        npx ts-node-esm ./export.ts
 
     - name: Publish
       uses: softprops/action-gh-release@v2
