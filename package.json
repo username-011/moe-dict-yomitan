@@ -4,8 +4,7 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/node": "24.2.0",
-    "grunt": "^1.6.1"
+    "@types/node": "24.2.0"
   },
   "peerDependencies": {
     "typescript": "^5"
