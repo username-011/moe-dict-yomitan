@@ -12,6 +12,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - uses: actions/setup-node@v4
         with:
@@ -21,10 +24,27 @@ jobs:
         run: |
           npm install
           node --loader ts-node/esm ./export.ts
+      - name: Generate the next release tag
+        id: generate_tag
+        uses: alexvingg/next-release-tag@v1.0.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # The tag will be in the format '20241109.1'
+          tag_prefix: "" # Remove the default 'v' prefix
+      - name: Create a Git tag
+        # The previous action only generates the tag name. This step creates the tag in the repository.
+        run: |
+          git tag ${{ steps.generate_tag.outputs.release_tag }}
+      - name: Push the new tag to GitHub
+        # This triggers the release by making the new tag available in the repository.
+        run: |
+          git push origin ${{ steps.generate_tag.outputs.release_tag }}
 
       - name: Publish
         uses: softprops/action-gh-release@v2
         with:
           files: build/*
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.generate_tag.outputs.release_tag }}
+          name: Release ${{ steps.generate_tag.outputs.release_tag }}
           generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
