@@ -3,13 +3,13 @@
     // Environment setup & latest features
     "lib": ["ESNext"],
     "target": "ESNext",
-    "module": "Preserve",
+    "module": "esnext",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
 
     // Bundler mode
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
@@ -27,9 +27,5 @@
     "noPropertyAccessFromIndexSignature": false,
 
     "esModuleInterop": true
-  },
-  "ts-node": {
-    "experimentalSpecifierResolution": "node",
-    "esm": true
   }
 }
