@@ -322,7 +322,7 @@ export async function addTermsMoe(
               return match + "\n";
             });
         } else if (["注音一式", "變體注音"].includes(key)) {
-          entry[key] = entry[key]?.replaceAll("\u3000", "");
+          entry[key] = entry[key]?.replaceAll(/[ \u3000]/g, "");
         } else if (typeof entry[key] === "string") {
           entry[key] = entry[key].trim();
         }
