@@ -64,8 +64,8 @@ function getAltReadingContent(
           },
         ],
       };
-    case "又音":
-      const youin: StructuredContentNode = {
+    case "又音": {
+      const label: StructuredContentNode = {
         tag: "span",
         content: "又音",
         data: { moedict: "alt-reading-label" },
@@ -76,27 +76,41 @@ function getAltReadingContent(
         content: [
           reading
             ? [
-                youin,
+                label,
                 {
                   tag: "span",
                   data: { moedict: "alt-reading-content" },
                   content: reading,
                 },
               ]
-            : youin,
+            : label,
         ],
       };
+    }
     case "語音":
-    case "讀音":
+    case "讀音": {
+      const label: StructuredContentNode = {
+        tag: "span",
+        content: altReadingType,
+        data: { moedict: "alt-reading-label" },
+      };
       return {
         tag: "span",
         data: { moedict: "alt-reading-parent", altReadingType },
-        content: {
-          tag: "span",
-          content: altReadingType,
-          data: { moedict: "alt-reading-label" },
-        },
+        content: [
+          reading
+            ? [
+                label,
+                {
+                  tag: "span",
+                  content: reading,
+                  data: { moedict: "alt-reading-content" },
+                },
+              ]
+            : label,
+        ],
       };
+    }
     default:
       return "";
   }
