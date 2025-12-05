@@ -6,6 +6,7 @@ import type {
   StructuredContent,
   StructuredContentNode,
 } from "yomichan-dict-builder/dist/types/yomitan/termbank";
+import { unsandhifyZhuyin } from "./utils.ts";
 const { OpenCC } = _OpenCC;
 
 const someEntry = {
@@ -43,18 +44,18 @@ type AltReadingType = "變" | "又音" | "語音" | "讀音";
 
 function getAltReadingContent(
   altReadingType: string,
-  switchAltPronunciations: boolean,
   reading?: string
 ): StructuredContentNode {
   switch (altReadingType as AltReadingType) {
     case "變":
+      if (!reading) return "";
       return {
         tag: "span",
         data: { moedict: "alt-reading-parent", altReadingType },
         content: [
           {
             tag: "span",
-            content: `${switchAltPronunciations ? "本音" : "變體注音"}`,
+            content: "本音",
             data: { moedict: "alt-reading-label" },
           },
           {
@@ -265,7 +266,6 @@ export async function addTermsMoe(
     string
   ],
   addSynonymsAntonyms = true,
-  switchAltPronunciations = true,
   popularityBoost = 100
 ) {
   await addFilesConcised(
@@ -322,7 +322,10 @@ export async function addTermsMoe(
               return match + "\n";
             });
         } else if (["注音一式", "變體注音"].includes(key)) {
-          entry[key] = entry[key]?.replaceAll(/[ \u3000]/g, "");
+          entry[key] = unsandhifyZhuyin(
+            entry["字詞名"] ?? "",
+            entry[key]?.trim() ?? ""
+          );
         } else if (typeof entry[key] === "string") {
           entry[key] = entry[key].trim();
         }
@@ -406,14 +409,14 @@ export async function addTermsMoe(
         }
       }
       const [adjustedZhuyinReading, adjustedPinyinReading] =
-        switchAltPronunciations && (altReadingType as AltReadingType) === "變"
+        (altReadingType as AltReadingType) === "變"
           ? [
               altZhuyinReading ?? zhuyinReading,
               altPinyinReading ?? pinyinReading,
             ]
           : [zhuyinReading, pinyinReading];
       const [adjustedAltZhuyinReading, adjustedAltPinyinReading] =
-        switchAltPronunciations && (altReadingType as AltReadingType) === "變"
+        (altReadingType as AltReadingType) === "變"
           ? [
               zhuyinReading !== adjustedZhuyinReading
                 ? zhuyinReading
@@ -433,11 +436,7 @@ export async function addTermsMoe(
           tag: "span",
           content: [
             termsParent,
-            getAltReadingContent(
-              altReadingType,
-              switchAltPronunciations,
-              adjustedAltZhuyinReading
-            ),
+            getAltReadingContent(altReadingType, adjustedAltZhuyinReading),
           ],
           data: { moedict: "first-row-parent" },
         },
@@ -451,11 +450,7 @@ export async function addTermsMoe(
           tag: "span",
           content: [
             termsParent,
-            getAltReadingContent(
-              altReadingType,
-              switchAltPronunciations,
-              adjustedAltPinyinReading
-            ),
+            getAltReadingContent(altReadingType, adjustedAltPinyinReading),
           ],
           data: { moedict: "first-row-parent" },
         },

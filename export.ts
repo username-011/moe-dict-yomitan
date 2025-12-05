@@ -2,8 +2,12 @@ import { Dictionary, DictionaryIndex } from "yomichan-dict-builder";
 import { addTermsMoe } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
 
-// only the 變 type
-const concisedSwitchAltPronunciations = true;
+const versions = {
+  moeConcised: "2025/12/05.1",
+  moeRevised: "2025/12/05.1",
+  liangAn: "2025/12/05.1",
+};
+
 // for the concised and revised moe dictionaries
 const addSynonymsAntonyms = true;
 // for the LiangAn dictionary
@@ -29,7 +33,6 @@ await addTermsMoe(
     "dict/dict_concised_pic_2014_20250925",
   ],
   addSynonymsAntonyms,
-  concisedSwitchAltPronunciations,
   popularityBoost
 );
 
@@ -81,7 +84,7 @@ export async function initDics(): Promise<
   });
   const zhuyinIndexConcised = new DictionaryIndex()
     .setTitle("國語辭典簡編本 注音")
-    .setRevision("2025/11/19.2")
+    .setRevision(versions.moeConcised)
     .setAuthor("shadow")
     .setAttribution("國語辭典簡編本 (2014)")
     .setDescription(
@@ -98,7 +101,7 @@ export async function initDics(): Promise<
   zhuyinIndexConcised.index.targetLanguage = "zh";
   const pinyinIndexConcised = new DictionaryIndex()
     .setTitle("國語辭典簡編本 拼音")
-    .setRevision("2025/11/19.2")
+    .setRevision(versions.moeConcised)
     .setAuthor("shadow")
     .setAttribution("國語辭典簡編本 (2014)")
     .setDescription(
@@ -126,7 +129,7 @@ export async function initDics(): Promise<
   await zhuyinRevisedDic.setIndex(
     zhuyinIndexConcised
       .setTitle("重編國語辭典修訂本 注音")
-      .setRevision("2025/11/19.2")
+      .setRevision(versions.moeRevised)
       .setDescription(
         "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
       )
@@ -145,7 +148,7 @@ export async function initDics(): Promise<
   await pinyinRevisedDic.setIndex(
     pinyinIndexConcised
       .setTitle("重編國語辭典修訂本 拼音")
-      .setRevision("2025/11/19.2")
+      .setRevision(versions.moeRevised)
       .setDescription(
         "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
       )
@@ -170,7 +173,7 @@ export async function initDics(): Promise<
   });
   const zhuyinIndexLiangAn = new DictionaryIndex()
     .setTitle("兩岸詞典 注音")
-    .setRevision("2025/11/05")
+    .setRevision(versions.liangAn)
     .setAuthor("shadow")
     .setAttribution("兩岸詞典 (2015)")
     .setDescription("A monolingual dictionary of Mandarin Chinese.")
@@ -185,7 +188,7 @@ export async function initDics(): Promise<
   zhuyinIndexLiangAn.index.targetLanguage = "zh";
   const pinyinIndexLiangAn = new DictionaryIndex()
     .setTitle("兩岸詞典 拼音")
-    .setRevision("2025/11/05")
+    .setRevision(versions.liangAn)
     .setAuthor("shadow")
     .setAttribution("兩岸詞典 (2015)")
     .setDescription("A monolingual dictionary of Mandarin Chinese.")
