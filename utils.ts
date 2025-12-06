@@ -1,5 +1,6 @@
 export function unsandhifyZhuyin(term: string, originalReading: string) {
   // \uff0c = ，
+  if (!originalReading) return "";
   term = term.replace(/\uff0c/g, "");
   originalReading = originalReading
     .replaceAll(" ", "\u3000")
