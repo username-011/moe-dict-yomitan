@@ -6,7 +6,6 @@ import type {
   StructuredContent,
   StructuredContentNode,
 } from "yomichan-dict-builder/dist/types/yomitan/termbank";
-import { unsandhifyZhuyin } from "./utils.ts";
 const { OpenCC } = _OpenCC;
 
 const someEntry = {
@@ -322,10 +321,9 @@ export async function addTermsMoe(
               return match + "\n";
             });
         } else if (["注音一式", "變體注音"].includes(key)) {
-          entry[key] = unsandhifyZhuyin(
-            entry["字詞名"] ?? "",
-            entry[key]?.trim() ?? ""
-          );
+          entry[key] = entry[key]?.replace(/[ \u3000\uff0c]/g, "") ?? "";
+        } else if (["漢語拼音", "變體漢語拼音"].includes(key)) {
+          entry[key] = entry[key]?.trim().replace(/\s*\uff0c\s*/g, " ");
         } else if (typeof entry[key] === "string") {
           entry[key] = entry[key].trim();
         }

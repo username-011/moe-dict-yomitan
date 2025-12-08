@@ -6,7 +6,6 @@ import type {
   StructuredContent,
   StructuredContentNode,
 } from "yomichan-dict-builder/dist/types/yomitan/termbank";
-import { unsandhifyZhuyin } from "./utils.ts";
 
 const someLiangAnEntry = {
   稿件版本: "1",
@@ -153,7 +152,6 @@ function getAdditionalInfo(
 export async function addTermsLiangAn(
   [liangAnDicZhuyin, liangAnDicPinyin]: [Dictionary, Dictionary],
   path: string,
-  addMainlandTWDistinctions = true,
   popularityBoost = 100
 ) {
   const fbLiangAn = readFileSync(path);
@@ -169,21 +167,12 @@ export async function addTermsLiangAn(
       if (["臺灣音讀", "大陸音讀"].includes(key) || key.startsWith("釋義")) {
         entry[key] = (entry[key] ?? "").replaceAll("丨", "ㄧ");
         if (["臺灣音讀", "大陸音讀"].includes(key))
-          entry[key] = unsandhifyZhuyin(
-            entry["正體字形"] || entry["簡化字形"] || "",
-            entry[key].trim() ?? ""
-          );
+          entry[key] = entry[key].replace(/[ \u3000\uff0c]/g, "") ?? "";
       } else if (["臺灣漢拼", "大陸漢拼"].includes(key)) {
-        entry[key] = entry[key]?.trim().replaceAll("\u0261", "g");
-        // maybe when any usable library is fixed by someone and we can reliably split pinyin, we can try once again
-        // note: when that happens, try words like 一塊兒, 一蹴而就, 一擁而上 etc.
-        // I don't care to do it myself.
-        // potentially this makes the entries readings be consistent with the other pinyin dics out there
-        // but I can't be bothered when there is no good library for splitting the pinyin syllables
-        // entry[key] = unsandhifyPinyin(
-        //   entry["正體字形"] || entry["簡化字形"] || "",
-        //   entry[key]?.trim()?.replaceAll("\u0261", "g") ?? ""
-        // );
+        entry[key] = entry[key]
+          ?.trim()
+          ?.replaceAll("\u0261", "g")
+          .replace(/[-,]/g, " ");
       }
       // not all keys have trimming so maybe apply it just in case
       if (typeof entry[key] === "string") {

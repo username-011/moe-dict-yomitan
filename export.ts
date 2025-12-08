@@ -3,9 +3,9 @@ import { addTermsMoe } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
 
 const versions = {
-  moeConcised: "2025/12/06.1",
-  moeRevised: "2025/12/06.1",
-  liangAn: "2025/12/06.1",
+  moeConcised: "2025/12/08.1",
+  moeRevised: "2025/12/08.1",
+  liangAn: "2025/12/08.1",
 };
 
 // for the concised and revised moe dictionaries
@@ -57,7 +57,6 @@ console.log("Exported 重編國語辭典修訂本 拼音");
 await addTermsLiangAn(
   [liangAnDicZhuyin, liangAnDicPinyin],
   "dict/liangancidian.xlsx",
-  addMainlandTWDistinctions,
   popularityBoost
 );
 
