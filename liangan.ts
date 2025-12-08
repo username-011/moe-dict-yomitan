@@ -6,6 +6,7 @@ import type {
   StructuredContent,
   StructuredContentNode,
 } from "yomichan-dict-builder/dist/types/yomitan/termbank";
+import { parsePinyin } from "./utils.ts";
 
 const someLiangAnEntry = {
   稿件版本: "1",
@@ -169,10 +170,10 @@ export async function addTermsLiangAn(
         if (["臺灣音讀", "大陸音讀"].includes(key))
           entry[key] = entry[key].replace(/[ \u3000\uff0c]/g, "") ?? "";
       } else if (["臺灣漢拼", "大陸漢拼"].includes(key)) {
-        entry[key] = entry[key]
-          ?.trim()
-          ?.replaceAll("\u0261", "g")
-          .replace(/[-,]/g, " ");
+        entry[key] = parsePinyin(
+          entry[key]?.trim()?.replaceAll("\u0261", "g").replace(/[-,]/g, " ") ??
+            ""
+        );
       }
       // not all keys have trimming so maybe apply it just in case
       if (typeof entry[key] === "string") {

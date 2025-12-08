@@ -13,6 +13,7 @@
   "dependencies": {
     "@xmldom/xmldom": "^0.8.11",
     "opencc": "github:BYVoid/OpenCC",
+    "pinyin-tone-tool": "^1.0.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "yomichan-dict-builder": "^2.9.2"
   },
