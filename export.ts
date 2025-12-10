@@ -36,14 +36,16 @@ await addTermsMoe(
   popularityBoost
 );
 
-[
+for (const f of [
   zhuyinConcisedDic,
   pinyinConcisedDic,
   zhuyinRevisedDic,
   pinyinRevisedDic,
   liangAnDicZhuyin,
   liangAnDicPinyin,
-].forEach((f) => f.addFile("./styles.css", "styles.css"));
+]) {
+  await f.addFile("./styles.css", "styles.css");
+}
 console.log("Exporting MOE dictionaries...");
 await zhuyinConcisedDic.export("build");
 console.log("Exported 國語辭典簡編本 注音");
