@@ -3,15 +3,13 @@ import { addTermsMoe } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
 
 const versions = {
-  moeConcised: "2025/12/08.1",
-  moeRevised: "2025/12/08.1",
-  liangAn: "2025/12/08.2",
+  moeConcised: "2025/12/14.1",
+  moeRevised: "2025/12/14.1",
+  liangAn: "2025/12/14.1",
 };
 
 // for the concised and revised moe dictionaries
 const addSynonymsAntonyms = true;
-// for the LiangAn dictionary
-const addMainlandTWDistinctions = true;
 // makes it so these dictionaries are prioritized in the search results (because they have some sort of frequency sort for the 多音字)
 const popularityBoost = 100;
 
