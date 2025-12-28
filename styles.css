@@ -31,6 +31,7 @@ for tone characters like "ˊ" or "ˋ"
   font-size: 1.1em;
   margin-right: 6px;
   vertical-align: bottom;
+  font-family: "Noto Sans CJK SC", sans-serif;
 }
 [data-sc-moedict="alt-reading-parent"] {
   display: inline-block;

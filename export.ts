@@ -3,9 +3,9 @@ import { addTermsMoe } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
 
 const versions = {
-  moeConcised: "2025/12/14.1",
-  moeRevised: "2025/12/14.1",
-  liangAn: "2025/12/14.1",
+  moeConcised: "2025/12/29.1",
+  moeRevised: "2025/12/29.1",
+  liangAn: "2025/12/29.1",
 };
 
 // for the concised and revised moe dictionaries
