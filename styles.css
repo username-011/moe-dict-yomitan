@@ -1,11 +1,8 @@
 /*
 bypasses the Yomitan's default Helvetica font fallback, which is bad for (rarely seen) Zhuyin display _inside_ the definitions
-and even though it will render the same CJK font, by setting font-family to sans-serif here,
-it resets the Helvetica fallback and triggers my PC to render Noto Sans CJK TC preferably, which has much more acceptable Zhuyin display
-for tone characters like "ˊ" or "ˋ" 
 */
 & {
-  font-family: "Noto Sans CJK TC", sans-serif;
+  font-family: sans-serif;
 }
 
 [data-sc-moedict="traditional-term"] {
@@ -19,7 +16,6 @@ for tone characters like "ˊ" or "ˋ"
   font-size: 1.1em;
   margin-right: 6px;
   vertical-align: bottom;
-  font-family: "Noto Sans CJK TC", sans-serif;
 }
 [data-sc-moedict="simplified-term"] {
   display: inline-block;
@@ -32,7 +28,6 @@ for tone characters like "ˊ" or "ˋ"
   font-size: 1.1em;
   margin-right: 6px;
   vertical-align: bottom;
-  font-family: "Noto Sans CJK SC", sans-serif;
 }
 [data-sc-moedict="alt-reading-parent"] {
   display: inline-block;
