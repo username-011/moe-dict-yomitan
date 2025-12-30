@@ -5,6 +5,19 @@ bypasses the Yomitan's default Helvetica font fallback, which is bad for (rarely
   font-family: sans-serif;
 }
 
+[data-sc-moedict="first-row-parent"] {
+  vertical-align: bottom;
+  display: inline-flex;
+}
+:is(
+    [data-sc-moedict="terms-parent"],
+    [data-sc-moedict="mainland-reading-parent"],
+    [data-sc-moedict="word-belong-parent"],
+    [data-sc-moedict="sound-belong-parent"],
+    [data-sc-moedict="alt-reading-parent"]
+  ) {
+  display: inline-flex;
+}
 [data-sc-moedict="traditional-term"] {
   display: inline-block;
   line-height: 1;
@@ -15,7 +28,6 @@ bypasses the Yomitan's default Helvetica font fallback, which is bad for (rarely
   padding: 4px;
   font-size: 1.1em;
   margin-right: 6px;
-  vertical-align: bottom;
 }
 [data-sc-moedict="simplified-term"] {
   display: inline-block;
@@ -27,16 +39,13 @@ bypasses the Yomitan's default Helvetica font fallback, which is bad for (rarely
   padding: 4px;
   font-size: 1.1em;
   margin-right: 6px;
-  vertical-align: bottom;
 }
 [data-sc-moedict="alt-reading-parent"] {
-  display: inline-block;
   line-height: 1;
   background: #111;
   font-size: 1.1em;
   border: 1px solid #454545;
   border-radius: 4px;
-  vertical-align: bottom;
   padding: 4px;
 }
 [data-sc-moedict="alt-reading-label"] {
@@ -136,7 +145,6 @@ bypasses the Yomitan's default Helvetica font fallback, which is bad for (rarely
 }
 
 [data-sc-moedict="mainland-reading-parent"] {
-  display: inline-block;
   line-height: 1;
   background: #111;
   font-size: 1.1em;
@@ -144,7 +152,6 @@ bypasses the Yomitan's default Helvetica font fallback, which is bad for (rarely
   border-radius: 4px;
   margin-right: 6px;
   padding: 4px;
-  vertical-align: bottom;
 }
 [data-sc-moedict="mainland-reading-label"] {
   border-right: 1px solid #454545;
@@ -156,7 +163,6 @@ bypasses the Yomitan's default Helvetica font fallback, which is bad for (rarely
 }
 
 [data-sc-moedict="word-belong-parent"] {
-  display: inline-block;
   line-height: 1;
   background: #111;
   font-size: 1.1em;
@@ -176,7 +182,6 @@ bypasses the Yomitan's default Helvetica font fallback, which is bad for (rarely
 }
 
 [data-sc-moedict="sound-belong-parent"] {
-  display: inline-block;
   line-height: 1;
   background: #111;
   font-size: 1.1em;
