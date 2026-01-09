@@ -4,7 +4,7 @@ import { addTermsLiangAn } from "./liangan.ts";
 
 const versions = {
   moeConcised: "2025/12/30.4",
-  moeRevised: "2025/12/30.4",
+  moeRevised: "2026/01/09.1",
   liangAn: "2025/12/30.4",
 };
 
