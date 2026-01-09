@@ -4,7 +4,7 @@ import { addTermsLiangAn } from "./liangan.ts";
 
 const versions = {
   moeConcised: "2025/12/30.4",
-  moeRevised: "2026/01/09.1",
+  moeRevised: "2026/01/09.2",
   liangAn: "2025/12/30.4",
 };
 
@@ -26,7 +26,7 @@ await addTermsMoe(
   [zhuyinConcisedDic, pinyinConcisedDic, zhuyinRevisedDic, pinyinRevisedDic],
   [
     "dict/dict_concised_2014_20250925.xlsx",
-    "dict/dict_revised_2015_20250923.xlsx",
+    "dict/dict_revised_2015_20251229.xlsx",
     "dict/dict_concised_pic_2014_20250925.xlsx",
     "dict/dict_concised_pic_2014_20250925",
   ],
