@@ -164,6 +164,9 @@ export async function addTermsLiangAn(
   for (const entry of dataLiangAn) {
     // preprocess a little bit
     for (const key in entry) {
+      if (typeof entry[key] === "string") {
+        entry[key] = entry[key].replaceAll("\u0261", "g").trim();
+      }
       // some keys have "丨" in them (supposed to be used in vertical text, but we use horizontal text)
       if (["臺灣音讀", "大陸音讀"].includes(key) || key.startsWith("釋義")) {
         entry[key] = (entry[key] ?? "").replaceAll("丨", "ㄧ");
@@ -171,13 +174,8 @@ export async function addTermsLiangAn(
           entry[key] = entry[key].replace(/[ \u3000\uff0c]/g, "") ?? "";
       } else if (["臺灣漢拼", "大陸漢拼"].includes(key)) {
         entry[key] = parsePinyin(
-          entry[key]?.trim()?.replaceAll("\u0261", "g").replace(/[-,]/g, " ") ??
-            ""
+          entry[key]?.trim()?.replace(/[-,]/g, " ") ?? ""
         );
-      }
-      // not all keys have trimming so maybe apply it just in case
-      if (typeof entry[key] === "string") {
-        entry[key] = entry[key].trim();
       }
     }
 

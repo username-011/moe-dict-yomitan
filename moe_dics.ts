@@ -148,6 +148,7 @@ function getContent(
 ): StructuredContentNode {
   const definitions = contentRaw.split("\n").map((definition) => {
     const examples = [] as StructuredContentNode[];
+    let also: StructuredContentNode = "";
     let adjustedDefinition = definition;
     if (dic === "Revised") {
       let matches: RegExpMatchArray | null = null;
@@ -165,6 +166,38 @@ function getContent(
           adjustedDefinition = adjustedDefinition.replace(match, "。");
         });
         adjustedDefinition = adjustedDefinition.replace("。。", "。");
+      }
+    } else if (dic === "Concised") {
+      if (adjustedDefinition.includes("◎")) {
+        adjustedDefinition = adjustedDefinition.replace("◎", "").trim();
+      }
+      const alsoMatch = adjustedDefinition.match(/△(.*$)/);
+      if (alsoMatch) {
+        const label = "也作";
+        const contents = alsoMatch[1]!
+          .split("、")
+          .map((s) => `「${s}」`)
+          .join("、");
+        also = {
+          tag: "span",
+          content: [
+            {
+              tag: "span",
+              content: label,
+              data: { moedict: "definition-entry-also-label" },
+            },
+            {
+              tag: "span",
+              content: contents,
+              data: { moedict: "definition-entry-also-content" },
+            },
+            "。",
+          ],
+          data: { moedict: "definition-entry-also-parent" },
+        };
+        adjustedDefinition = adjustedDefinition
+          .replace(alsoMatch[0]!, "")
+          .trim();
       }
     }
     let content: StructuredContentNode =
@@ -199,6 +232,7 @@ function getContent(
           content,
           data: { moedict: "definition-entry-content" },
         },
+        also,
         examples,
       ],
       data: { moedict: "definition-entry" },
