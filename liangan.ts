@@ -58,31 +58,14 @@ function getContent(contentRow: string, term: string): StructuredContentNode {
       },
     ] satisfies StructuredContentNode;
   }
-  let also: StructuredContentNode = "";
-  const alsoMatch = contentRow.match(/∥也作(.*?)(（.*?）)?。/);
-  if (alsoMatch) {
-    const [fullMatch, terms, note] = alsoMatch;
-    also = {
+  let note: StructuredContentNode = "";
+  const noteMatch = contentRow.match(/∥(.*)$/);
+  if (noteMatch) {
+    const [fullMatch, content] = noteMatch;
+    note = {
       tag: "span",
-      content: [
-        {
-          tag: "span",
-          content: "也作",
-          data: { moedict: "definition-entry-also-label" },
-        },
-        {
-          tag: "span",
-          content: terms,
-          data: { moedict: "definition-entry-also-content" },
-        },
-        {
-          tag: "span",
-          content: note,
-          data: { moedict: "definition-entry-also-note" },
-        },
-        "。",
-      ],
-      data: { moedict: "definition-entry-also-parent" },
+      content,
+      data: { moedict: "definition-entry-note" },
     };
     contentRow = contentRow.replace(fullMatch, "").trim();
   }
@@ -95,7 +78,7 @@ function getContent(contentRow: string, term: string): StructuredContentNode {
         content: content,
         data: { moedict: "definition-entry-content" },
       },
-      also,
+      note,
       example
         ? {
             tag: "span",
