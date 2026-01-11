@@ -46,7 +46,7 @@ type LiangAnEntry = Record<string, string | undefined> &
 
 function getContent(contentRow: string, term: string): StructuredContentNode {
   let note: StructuredContentNode = "";
-  const noteMatch = contentRow.match(/∥(.*)$/);
+  const noteMatch = contentRow.match(/[∥‖](.*)$/);
   if (noteMatch) {
     const [fullMatch, content] = noteMatch;
     note = {
