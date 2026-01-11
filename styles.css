@@ -192,3 +192,7 @@
 [data-sc-moedict="sound-belong-content"] {
   padding-left: 4px;
 }
+
+[data-sc-moedict="definition-entry-note"] {
+  color: #dce19b;
+}
