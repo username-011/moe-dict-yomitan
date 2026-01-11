@@ -45,6 +45,17 @@ type LiangAnEntry = Record<string, string | undefined> &
   };
 
 function getContent(contentRow: string, term: string): StructuredContentNode {
+  let note: StructuredContentNode = "";
+  const noteMatch = contentRow.match(/∥(.*)$/);
+  if (noteMatch) {
+    const [fullMatch, content] = noteMatch;
+    note = {
+      tag: "span",
+      content,
+      data: { moedict: "definition-entry-note" },
+    };
+    contentRow = contentRow.replace(fullMatch, "").trim();
+  }
   let content: StructuredContentNode =
     contentRow.match(/(^.*?(?=(\[例\])))|(^.*(?!(\[例\])))/g)?.at(0) ?? "";
   const pos = contentRow.match(/^\d\..*(?=：$)/g);
@@ -57,17 +68,6 @@ function getContent(contentRow: string, term: string): StructuredContentNode {
         data: { moedict: "pos-label" },
       },
     ] satisfies StructuredContentNode;
-  }
-  let note: StructuredContentNode = "";
-  const noteMatch = contentRow.match(/∥(.*)$/);
-  if (noteMatch) {
-    const [fullMatch, content] = noteMatch;
-    note = {
-      tag: "span",
-      content,
-      data: { moedict: "definition-entry-note" },
-    };
-    contentRow = contentRow.replace(fullMatch, "").trim();
   }
   const example = contentRow.match(/(?<=\[例\]).*/g)?.at(0);
   return {
