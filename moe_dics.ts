@@ -174,7 +174,8 @@ function getContent(
       const alsoMatch = adjustedDefinition.match(/△(.*$)/);
       if (alsoMatch) {
         const label = "也作";
-        const contents = alsoMatch[1]!
+        const [fullMatch, matchedContents] = alsoMatch;
+        const contents = matchedContents!
           .split("、")
           .map((s) => `「${s}」`)
           .join("、");
@@ -195,9 +196,7 @@ function getContent(
           ],
           data: { moedict: "definition-entry-also-parent" },
         };
-        adjustedDefinition = adjustedDefinition
-          .replace(alsoMatch[0]!, "")
-          .trim();
+        adjustedDefinition = adjustedDefinition.replace(fullMatch, "").trim();
       }
     }
     let content: StructuredContentNode =
