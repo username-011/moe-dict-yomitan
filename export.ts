@@ -5,7 +5,7 @@ import { addTermsLiangAn } from "./liangan.ts";
 const versions = {
   moeConcised: "2026/01/11.2",
   moeRevised: "2026/01/09.2",
-  liangAn: "2026/01/11.8",
+  liangAn: "2026/01/27.1",
 };
 
 // for the concised and revised moe dictionaries
@@ -31,7 +31,7 @@ await addTermsMoe(
     "dict/dict_concised_pic_2014_20250925",
   ],
   addSynonymsAntonyms,
-  popularityBoost
+  popularityBoost,
 );
 
 for (const f of [
@@ -57,7 +57,7 @@ console.log("Exported 重編國語辭典修訂本 拼音");
 await addTermsLiangAn(
   [liangAnDicZhuyin, liangAnDicPinyin],
   "dict/liangancidian.xlsx",
-  popularityBoost
+  popularityBoost,
 );
 
 console.log("Exporting LiangAn dictionary...");
@@ -87,14 +87,14 @@ export async function initDics(): Promise<
     .setAuthor("shadow")
     .setAttribution("國語辭典簡編本 (2014)")
     .setDescription(
-      "A monolingual dictionary made for learners of Mandarin Chinese. 主要適用對象：國中、小學生及學習華語人士。"
+      "A monolingual dictionary made for learners of Mandarin Chinese. 主要適用對象：國中、小學生及學習華語人士。",
     )
     .setIsUpdatable(true)
     .setIndexUrl(
-      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-concised-zhuyin.json"
+      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-concised-zhuyin.json",
     )
     .setDownloadUrl(
-      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-concised-zhuyin.zip"
+      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-concised-zhuyin.zip",
     );
   zhuyinIndexConcised.index.sourceLanguage = "zh";
   zhuyinIndexConcised.index.targetLanguage = "zh";
@@ -104,64 +104,64 @@ export async function initDics(): Promise<
     .setAuthor("shadow")
     .setAttribution("國語辭典簡編本 (2014)")
     .setDescription(
-      "A monolingual dictionary made for learners of Mandarin Chinese. 主要適用對象：國中、小學生及學習華語人士。"
+      "A monolingual dictionary made for learners of Mandarin Chinese. 主要適用對象：國中、小學生及學習華語人士。",
     )
     .setIsUpdatable(true)
     .setIndexUrl(
-      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-concised-pinyin.json"
+      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-concised-pinyin.json",
     )
     .setDownloadUrl(
-      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-concised-pinyin.zip"
+      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-concised-pinyin.zip",
     );
   pinyinIndexConcised.index.sourceLanguage = "zh";
   pinyinIndexConcised.index.targetLanguage = "zh";
   await zhuyinConcisedDic.setIndex(
     zhuyinIndexConcised.build(),
     "build",
-    "index-concised-zhuyin.json"
+    "index-concised-zhuyin.json",
   );
   await pinyinConcisedDic.setIndex(
     pinyinIndexConcised.build(),
     "build",
-    "index-concised-pinyin.json"
+    "index-concised-pinyin.json",
   );
   await zhuyinRevisedDic.setIndex(
     zhuyinIndexConcised
       .setTitle("重編國語辭典修訂本 注音")
       .setRevision(versions.moeRevised)
       .setDescription(
-        "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
+        "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。",
       )
       .setAttribution("重編國語辭典修訂本 (2015)")
       .setIsUpdatable(true)
       .setIndexUrl(
-        "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-revised-zhuyin.json"
+        "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-revised-zhuyin.json",
       )
       .setDownloadUrl(
-        "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-revised-zhuyin.zip"
+        "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-revised-zhuyin.zip",
       )
       .build(),
     "build",
-    "index-revised-zhuyin.json"
+    "index-revised-zhuyin.json",
   );
   await pinyinRevisedDic.setIndex(
     pinyinIndexConcised
       .setTitle("重編國語辭典修訂本 拼音")
       .setRevision(versions.moeRevised)
       .setDescription(
-        "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。"
+        "A monolingual dictionary made for Mandarin Chinese. 主要適用對象：對歷史語言有興趣的研究者。",
       )
       .setIsUpdatable(true)
       .setIndexUrl(
-        "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-revised-pinyin.json"
+        "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-revised-pinyin.json",
       )
       .setDownloadUrl(
-        "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-revised-pinyin.zip"
+        "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-revised-pinyin.zip",
       )
       .setAttribution("重編國語辭典修訂本 (2015)")
       .build(),
     "build",
-    "index-revised-pinyin.json"
+    "index-revised-pinyin.json",
   );
 
   const liangAnDicZhuyin = new Dictionary({
@@ -178,10 +178,10 @@ export async function initDics(): Promise<
     .setDescription("A monolingual dictionary of Mandarin Chinese.")
     .setIsUpdatable(true)
     .setIndexUrl(
-      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-liangancidian-zhuyin.json"
+      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-liangancidian-zhuyin.json",
     )
     .setDownloadUrl(
-      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/liangancidian-zhuyin.zip"
+      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/liangancidian-zhuyin.zip",
     );
   zhuyinIndexLiangAn.index.sourceLanguage = "zh";
   zhuyinIndexLiangAn.index.targetLanguage = "zh";
@@ -193,22 +193,22 @@ export async function initDics(): Promise<
     .setDescription("A monolingual dictionary of Mandarin Chinese.")
     .setIsUpdatable(true)
     .setIndexUrl(
-      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-liangancidian-pinyin.json"
+      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/index-liangancidian-pinyin.json",
     )
     .setDownloadUrl(
-      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/liangancidian-pinyin.zip"
+      "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/liangancidian-pinyin.zip",
     );
   pinyinIndexLiangAn.index.sourceLanguage = "zh";
   pinyinIndexLiangAn.index.targetLanguage = "zh";
   await liangAnDicZhuyin.setIndex(
     zhuyinIndexLiangAn.build(),
     "build",
-    "index-liangancidian-zhuyin.json"
+    "index-liangancidian-zhuyin.json",
   );
   await liangAnDicPinyin.setIndex(
     pinyinIndexLiangAn.build(),
     "build",
-    "index-liangancidian-pinyin.json"
+    "index-liangancidian-pinyin.json",
   );
 
   return [
