@@ -29,7 +29,7 @@ export type MoeEntry = Record<string, string | undefined> & typeof someEntry;
 
 export async function addFilesConcised(
   [zhuyinConcisedDic, pinyinConcisedDic]: [Dictionary, Dictionary],
-  concisedPicFolder: string
+  concisedPicFolder: string,
 ) {
   // add everything from the folder
   readdirSync(concisedPicFolder).forEach((file) => {
@@ -43,7 +43,7 @@ type AltReadingType = "變" | "又音" | "語音" | "讀音";
 
 function getAltReadingContent(
   altReadingType: string,
-  reading?: string
+  reading?: string,
 ): StructuredContentNode {
   switch (altReadingType as AltReadingType) {
     case "變":
@@ -119,7 +119,7 @@ function getAltReadingContent(
 function getExample(
   label: string,
   content: string,
-  dic: "Concised" | "Revised"
+  dic: "Concised" | "Revised",
 ) {
   return {
     tag: "span",
@@ -144,7 +144,7 @@ function getExample(
 
 function getContent(
   contentRaw: string,
-  dic: "Concised" | "Revised"
+  dic: "Concised" | "Revised",
 ): StructuredContentNode {
   const definitions = contentRaw.split("\n").map((definition) => {
     const examples = [] as StructuredContentNode[];
@@ -154,7 +154,7 @@ function getContent(
       let matches: RegExpMatchArray | null = null;
       while (
         (matches = adjustedDefinition.match(
-          /。(?![」』])[^\n。]*?：[「〈].*?[」〉](?:、?[「〈].*?[」〉])*/g
+          /。(?![」』〉》])[^\n。]+?：(?:「.+?」|〈.+?〉)(?:、?(?:「.*?」|〈.*?〉))*/g,
         )) !== null
       ) {
         matches?.forEach((match) => {
@@ -247,7 +247,7 @@ function getContent(
 function getMeaning(
   meaningRaw: string,
   term: string,
-  dic: "Concised" | "Revised"
+  dic: "Concised" | "Revised",
 ): StructuredContentNode {
   const parent = {
     tag: "div",
@@ -277,7 +277,7 @@ function getMeaning(
             },
           ],
           data: { moedict: "pos-entry-parent" },
-        } satisfies StructuredContentNode)
+        }) satisfies StructuredContentNode,
     ),
     data: { moedict: "pos-parent" },
   } satisfies StructuredContentNode;
@@ -289,20 +289,20 @@ export async function addTermsMoe(
     Dictionary,
     Dictionary,
     Dictionary,
-    Dictionary
+    Dictionary,
   ],
   [concisedPath, revisedPath, concisedPicsIndexPath, concisedPicsPath]: [
     string,
     string,
     string,
-    string
+    string,
   ],
   addSynonymsAntonyms = true,
-  popularityBoost = 100
+  popularityBoost = 100,
 ) {
   await addFilesConcised(
     [zhuyinConcisedDic, pinyinConcisedDic],
-    concisedPicsPath
+    concisedPicsPath,
   );
   const fbConcised = readFileSync(concisedPath);
   const fbRevised = readFileSync(revisedPath);
@@ -323,18 +323,21 @@ export async function addTermsMoe(
       圖片題名: string;
       檔案名稱: string;
     }[]
-  ).reduce((acc, cur) => {
-    const prev = (acc[cur.字詞號.trim()] || []) as {
-      title: string;
-      fileName: string;
-    }[];
-    prev.push({
-      title: cur.圖片題名.trim(),
-      fileName: cur.檔案名稱.trim(),
-    });
-    acc[cur.字詞號.trim()] = prev;
-    return acc;
-  }, {} as Record<string, { title: string; fileName: string }[]>);
+  ).reduce(
+    (acc, cur) => {
+      const prev = (acc[cur.字詞號.trim()] || []) as {
+        title: string;
+        fileName: string;
+      }[];
+      prev.push({
+        title: cur.圖片題名.trim(),
+        fileName: cur.檔案名稱.trim(),
+      });
+      acc[cur.字詞號.trim()] = prev;
+      return acc;
+    },
+    {} as Record<string, { title: string; fileName: string }[]>,
+  );
   const simplifiedConverter = new OpenCC("tw2s.json");
   let processedEntries = 0;
   for (let i = 0; i < 2; i++) {
@@ -415,7 +418,7 @@ export async function addTermsMoe(
             data: { moedict: "synonyms-content" },
           });
           (additionalFieldsParent.content as StructuredContentNode[]).push(
-            parentDiv
+            parentDiv,
           );
         }
         if (antonyms) {
@@ -435,7 +438,7 @@ export async function addTermsMoe(
             data: { moedict: "antonyms-content" },
           });
           (additionalFieldsParent.content as StructuredContentNode[]).push(
-            parentDiv
+            parentDiv,
           );
         }
       }
@@ -460,7 +463,7 @@ export async function addTermsMoe(
       const meaningElement = getMeaning(
         meaning,
         term,
-        i === 0 ? "Concised" : "Revised"
+        i === 0 ? "Concised" : "Revised",
       );
       const contentZhuyin: StructuredContent = [
         {
@@ -493,7 +496,7 @@ export async function addTermsMoe(
       const entryId = (entry.字詞號 ?? "").trim();
       if (i === 0 && entryId && dataConcisedPicsIndex[entryId]) {
         const pics = dataConcisedPicsIndex[entryId]!.toSorted((a, b) =>
-          a.title.localeCompare(b.title, "zh-Hant-TW")
+          a.title.localeCompare(b.title, "zh-Hant-TW"),
         );
         pics.forEach(({ title, fileName }) => {
           const imgEl = {
