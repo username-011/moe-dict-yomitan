@@ -154,7 +154,7 @@ function getContent(
       let matches: RegExpMatchArray | null = null;
       while (
         (matches = adjustedDefinition.match(
-          /。(?![」』〉》])[^\n。]+?：(?:「.+?」|〈.+?〉)(?:、?(?:「.*?」|〈.*?〉))*/g,
+          /。(?![」』])[^\n。]+?：(?:、?(?:「.+?」|〈.+?〉))+/g,
         )) !== null
       ) {
         matches?.forEach((match) => {
