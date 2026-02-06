@@ -168,9 +168,7 @@ function getContent(
         adjustedDefinition = adjustedDefinition.replace("。。", "。");
       }
     } else if (dic === "Concised") {
-      if (adjustedDefinition.includes("◎")) {
-        adjustedDefinition = adjustedDefinition.replace("◎", "").trim();
-      }
+      adjustedDefinition = adjustedDefinition.replaceAll("◎", "").trim();
       const alsoMatch = adjustedDefinition.match(/△(.*$)/);
       if (alsoMatch) {
         const label = "也作";

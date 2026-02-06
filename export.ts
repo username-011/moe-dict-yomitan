@@ -3,7 +3,7 @@ import { addTermsMoe } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
 
 const versions = {
-  moeConcised: "2026/01/11.2",
+  moeConcised: "2026/02/06.1",
   moeRevised: "2026/01/30.2",
   liangAn: "2026/01/27.1",
 };
