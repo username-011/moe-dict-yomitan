@@ -6,6 +6,7 @@ import type {
   StructuredContent,
   StructuredContentNode,
 } from "yomichan-dict-builder/dist/types/yomitan/termbank";
+import { hasReading, readingSpans, type SystemReadings } from "./readings.ts";
 const { OpenCC } = _OpenCC;
 
 const someEntry = {
@@ -41,79 +42,30 @@ export async function addFilesConcised(
 
 type AltReadingType = "變" | "又音" | "語音" | "讀音";
 
+/**
+ * The alternative-reading block. Both reading systems are emitted (tagged `reading-tag`) so the
+ * content is identical in the zhuyin and pinyin editions; each edition hides the other via CSS.
+ */
 function getAltReadingContent(
   altReadingType: string,
-  reading?: string,
+  readings: SystemReadings,
 ): StructuredContentNode {
-  switch (altReadingType as AltReadingType) {
-    case "變":
-      if (!reading) return "";
-      return {
-        tag: "span",
-        data: { moedict: "alt-reading-parent", altReadingType },
-        content: [
-          {
-            tag: "span",
-            content: "本音",
-            data: { moedict: "alt-reading-label" },
-          },
-          {
-            tag: "span",
-            data: { moedict: "alt-reading-content" },
-            content: reading ?? "",
-          },
-        ],
-      };
-    case "又音": {
-      const label: StructuredContentNode = {
-        tag: "span",
-        content: "又音",
-        data: { moedict: "alt-reading-label" },
-      };
-      return {
-        tag: "span",
-        data: { moedict: "alt-reading-parent", altReadingType },
-        content: [
-          reading
-            ? [
-                label,
-                {
-                  tag: "span",
-                  data: { moedict: "alt-reading-content" },
-                  content: reading,
-                },
-              ]
-            : label,
-        ],
-      };
-    }
-    case "語音":
-    case "讀音": {
-      const label: StructuredContentNode = {
-        tag: "span",
-        content: altReadingType,
-        data: { moedict: "alt-reading-label" },
-      };
-      return {
-        tag: "span",
-        data: { moedict: "alt-reading-parent", altReadingType },
-        content: [
-          reading
-            ? [
-                label,
-                {
-                  tag: "span",
-                  content: reading,
-                  data: { moedict: "alt-reading-content" },
-                },
-              ]
-            : label,
-        ],
-      };
-    }
-    default:
-      return "";
-  }
+  const type = altReadingType as AltReadingType;
+  if (!["變", "又音", "語音", "讀音"].includes(type)) return "";
+  const present = hasReading(readings);
+  if (type === "變" && !present) return "";
+  const label: StructuredContentNode = {
+    tag: "span",
+    content: type === "變" ? "本音" : type,
+    data: { moedict: "alt-reading-label" },
+  };
+  return {
+    tag: "span",
+    data: { moedict: "alt-reading-parent", altReadingType },
+    content: present
+      ? [label, ...readingSpans(readings, "alt-reading-content")]
+      : [label],
+  };
 }
 
 function getExample(
@@ -339,6 +291,9 @@ export async function addTermsMoe(
   const simplifiedConverter = new OpenCC("tw2s.json");
   let processedEntries = 0;
   for (let i = 0; i < 2; i++) {
+    // One sequence number per source entry (per dictionary), shared by its traditional and
+    // simplified rows and identical in both editions, so consumers can group them back together.
+    let sequence = 0;
     for (const entry of i === 0 ? dataConcised : dataRevised) {
       // trim all the fields of entry before processing
       for (const key in entry) {
@@ -355,9 +310,9 @@ export async function addTermsMoe(
               return match + "\n";
             });
         } else if (["注音一式", "變體注音"].includes(key)) {
-          entry[key] = entry[key]?.replace(/[ \u3000\uff0c]/g, "") ?? "";
+          entry[key] = entry[key]?.replace(/[ 　，]/g, "") ?? "";
         } else if (["漢語拼音", "變體漢語拼音"].includes(key)) {
-          entry[key] = entry[key]?.trim().replace(/\s*\uff0c\s*/g, " ");
+          entry[key] = entry[key]?.trim().replace(/\s*，\s*/g, " ");
         } else if (typeof entry[key] === "string") {
           entry[key] = entry[key].trim();
         }
@@ -440,49 +395,30 @@ export async function addTermsMoe(
           );
         }
       }
-      const [adjustedZhuyinReading, adjustedPinyinReading] =
-        (altReadingType as AltReadingType) === "變"
-          ? [
-              altZhuyinReading ?? zhuyinReading,
-              altPinyinReading ?? pinyinReading,
-            ]
-          : [zhuyinReading, pinyinReading];
-      const [adjustedAltZhuyinReading, adjustedAltPinyinReading] =
-        (altReadingType as AltReadingType) === "變"
-          ? [
-              zhuyinReading !== adjustedZhuyinReading
-                ? zhuyinReading
-                : undefined,
-              pinyinReading !== adjustedPinyinReading
-                ? pinyinReading
-                : undefined,
-            ]
-          : [altZhuyinReading, altPinyinReading];
+      const isBian = (altReadingType as AltReadingType) === "變";
+      // For 變 the variant reading becomes the main reading and the original one is shown as 本音.
+      const [adjustedZhuyinReading, adjustedPinyinReading] = isBian
+        ? [altZhuyinReading ?? zhuyinReading, altPinyinReading ?? pinyinReading]
+        : [zhuyinReading, pinyinReading];
+      // Show the alternative-reading block when it differs in either system; then emit both
+      // systems' readings so the content stays identical between editions.
+      const altReadings: SystemReadings = isBian
+        ? zhuyinReading !== adjustedZhuyinReading ||
+          pinyinReading !== adjustedPinyinReading
+          ? { zhuyin: zhuyinReading, pinyin: pinyinReading }
+          : {}
+        : { zhuyin: altZhuyinReading, pinyin: altPinyinReading };
       const meaningElement = getMeaning(
         meaning,
         term,
         i === 0 ? "Concised" : "Revised",
       );
-      const contentZhuyin: StructuredContent = [
+      const content: StructuredContent = [
         {
           tag: "span",
           content: [
             termsParent,
-            getAltReadingContent(altReadingType, adjustedAltZhuyinReading),
-          ],
-          data: { moedict: "first-row-parent" },
-        },
-        (additionalFieldsParent.content as StructuredContentNode[]).length > 0
-          ? additionalFieldsParent
-          : "",
-        meaningElement,
-      ];
-      const contentPinyin: StructuredContent = [
-        {
-          tag: "span",
-          content: [
-            termsParent,
-            getAltReadingContent(altReadingType, adjustedAltPinyinReading),
+            getAltReadingContent(altReadingType, altReadings),
           ],
           data: { moedict: "first-row-parent" },
         },
@@ -511,23 +447,25 @@ export async function addTermsMoe(
               },
             ],
           } as StructuredContentNode;
-          contentZhuyin.push(imgEl);
-          contentPinyin.push(imgEl);
+          content.push(imgEl);
         });
       }
+      const entrySequence = ++sequence;
       const zhuyinTermEntry = new TermEntry(term)
         .setReading(adjustedZhuyinReading ?? "")
+        .setSequenceNumber(entrySequence)
         .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
         .addDetailedDefinition({
           type: "structured-content",
-          content: { tag: "span", content: contentZhuyin, lang: "zh-TW" },
+          content: { tag: "span", content, lang: "zh-TW" },
         });
       const pinyinTermEntry = new TermEntry(term)
         .setReading(adjustedPinyinReading ?? "")
+        .setSequenceNumber(entrySequence)
         .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
         .addDetailedDefinition({
           type: "structured-content",
-          content: { tag: "span", content: contentPinyin, lang: "zh-TW" },
+          content: { tag: "span", content, lang: "zh-TW" },
         });
 
       await Promise.all([

@@ -1,6 +1,21 @@
 import { Dictionary, DictionaryIndex } from "yomichan-dict-builder";
 import { addTermsMoe } from "./moe_dics.ts";
 import { addTermsLiangAn } from "./liangan.ts";
+import { hideOtherReadingSystemCss } from "./readings.ts";
+import { readFileSync, writeFileSync } from "fs";
+
+// JSZip re-encodes string inputs to UTF-8 in 16 KiB chunks, so a surrogate pair (an astral CJK
+// character) that straddles a chunk boundary turns into two U+FFFD characters. Hand it bytes.
+(Dictionary.prototype as any).saveJsonToZip = async function (
+  fileName: string,
+  data: unknown,
+) {
+  this.zip.file(fileName, Buffer.from(JSON.stringify(data), "utf8"));
+};
+
+
+// Output directory for the zips and index files (the release workflow publishes build/*).
+const OUT_DIR = process.env.OUT_DIR ?? "build";
 
 const versions = {
   moeConcised: "2026/02/06.1",
@@ -34,24 +49,25 @@ await addTermsMoe(
   popularityBoost,
 );
 
-for (const f of [
-  zhuyinConcisedDic,
-  pinyinConcisedDic,
-  zhuyinRevisedDic,
-  pinyinRevisedDic,
-  liangAnDicZhuyin,
-  liangAnDicPinyin,
-]) {
-  await f.addFile("./styles.css", "styles.css");
+// Content is identical in both editions and carries both reading systems; each edition's
+// styles.css hides the other system (see readings.ts).
+const baseCss = readFileSync("./styles.css", "utf-8");
+writeFileSync("./styles-zhuyin.css", baseCss + hideOtherReadingSystemCss("zhuyin"));
+writeFileSync("./styles-pinyin.css", baseCss + hideOtherReadingSystemCss("pinyin"));
+for (const f of [zhuyinConcisedDic, zhuyinRevisedDic, liangAnDicZhuyin]) {
+  await f.addFile("./styles-zhuyin.css", "styles.css");
+}
+for (const f of [pinyinConcisedDic, pinyinRevisedDic, liangAnDicPinyin]) {
+  await f.addFile("./styles-pinyin.css", "styles.css");
 }
 console.log("Exporting MOE dictionaries...");
-await zhuyinConcisedDic.export("build");
+await zhuyinConcisedDic.export(OUT_DIR);
 console.log("Exported 國語辭典簡編本 注音");
-await pinyinConcisedDic.export("build");
+await pinyinConcisedDic.export(OUT_DIR);
 console.log("Exported 國語辭典簡編本 拼音");
-await zhuyinRevisedDic.export("build");
+await zhuyinRevisedDic.export(OUT_DIR);
 console.log("Exported 重編國語辭典修訂本 注音");
-await pinyinRevisedDic.export("build");
+await pinyinRevisedDic.export(OUT_DIR);
 console.log("Exported 重編國語辭典修訂本 拼音");
 
 await addTermsLiangAn(
@@ -61,9 +77,9 @@ await addTermsLiangAn(
 );
 
 console.log("Exporting LiangAn dictionary...");
-await liangAnDicZhuyin.export("build");
+await liangAnDicZhuyin.export(OUT_DIR);
 console.log("Exported 兩岸詞典 注音");
-await liangAnDicPinyin.export("build");
+await liangAnDicPinyin.export(OUT_DIR);
 console.log("Exported 兩岸詞典 拼音");
 
 export async function initDics(): Promise<
@@ -85,6 +101,7 @@ export async function initDics(): Promise<
     .setTitle("國語辭典簡編本 注音")
     .setRevision(versions.moeConcised)
     .setAuthor("shadow")
+    .setSequenced(true)
     .setAttribution("國語辭典簡編本 (2014)")
     .setDescription(
       "A monolingual dictionary made for learners of Mandarin Chinese. 主要適用對象：國中、小學生及學習華語人士。",
@@ -102,6 +119,7 @@ export async function initDics(): Promise<
     .setTitle("國語辭典簡編本 拼音")
     .setRevision(versions.moeConcised)
     .setAuthor("shadow")
+    .setSequenced(true)
     .setAttribution("國語辭典簡編本 (2014)")
     .setDescription(
       "A monolingual dictionary made for learners of Mandarin Chinese. 主要適用對象：國中、小學生及學習華語人士。",
@@ -117,12 +135,12 @@ export async function initDics(): Promise<
   pinyinIndexConcised.index.targetLanguage = "zh";
   await zhuyinConcisedDic.setIndex(
     zhuyinIndexConcised.build(),
-    "build",
+    OUT_DIR,
     "index-concised-zhuyin.json",
   );
   await pinyinConcisedDic.setIndex(
     pinyinIndexConcised.build(),
-    "build",
+    OUT_DIR,
     "index-concised-pinyin.json",
   );
   await zhuyinRevisedDic.setIndex(
@@ -141,7 +159,7 @@ export async function initDics(): Promise<
         "https://github.com/username-011/moe-dict-yomitan/releases/latest/download/moe-revised-zhuyin.zip",
       )
       .build(),
-    "build",
+    OUT_DIR,
     "index-revised-zhuyin.json",
   );
   await pinyinRevisedDic.setIndex(
@@ -160,7 +178,7 @@ export async function initDics(): Promise<
       )
       .setAttribution("重編國語辭典修訂本 (2015)")
       .build(),
-    "build",
+    OUT_DIR,
     "index-revised-pinyin.json",
   );
 
@@ -174,6 +192,7 @@ export async function initDics(): Promise<
     .setTitle("兩岸詞典 注音")
     .setRevision(versions.liangAn)
     .setAuthor("shadow")
+    .setSequenced(true)
     .setAttribution("兩岸詞典 (2015)")
     .setDescription("A monolingual dictionary of Mandarin Chinese.")
     .setIsUpdatable(true)
@@ -189,6 +208,7 @@ export async function initDics(): Promise<
     .setTitle("兩岸詞典 拼音")
     .setRevision(versions.liangAn)
     .setAuthor("shadow")
+    .setSequenced(true)
     .setAttribution("兩岸詞典 (2015)")
     .setDescription("A monolingual dictionary of Mandarin Chinese.")
     .setIsUpdatable(true)
@@ -202,12 +222,12 @@ export async function initDics(): Promise<
   pinyinIndexLiangAn.index.targetLanguage = "zh";
   await liangAnDicZhuyin.setIndex(
     zhuyinIndexLiangAn.build(),
-    "build",
+    OUT_DIR,
     "index-liangancidian-zhuyin.json",
   );
   await liangAnDicPinyin.setIndex(
     pinyinIndexLiangAn.build(),
-    "build",
+    OUT_DIR,
     "index-liangancidian-pinyin.json",
   );
 

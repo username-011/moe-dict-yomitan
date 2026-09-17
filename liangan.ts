@@ -7,6 +7,7 @@ import type {
   StructuredContentNode,
 } from "yomichan-dict-builder/dist/types/yomitan/termbank";
 import { parsePinyin } from "./utils.ts";
+import { hasReading, readingSpans, type SystemReadings } from "./readings.ts";
 
 const someLiangAnEntry = {
   稿件版本: "1",
@@ -103,12 +104,12 @@ function getContent(contentRow: string, term: string): StructuredContentNode {
 }
 
 function getAdditionalInfo(
-  altReading?: string,
+  mainlandReading?: SystemReadings,
   taiwanOrChinaTerm?: string,
   taiwanOrChinaReading?: string
 ): StructuredContentNode[] {
   const info = [] as StructuredContentNode[];
-  altReading &&
+  hasReading(mainlandReading) &&
     info.push({
       tag: "span",
       content: [
@@ -117,11 +118,7 @@ function getAdditionalInfo(
           content: "大陸音讀",
           data: { moedict: "mainland-reading-label" },
         },
-        {
-          tag: "span",
-          content: altReading,
-          data: { moedict: "mainland-reading-content" },
-        },
+        ...readingSpans(mainlandReading, "mainland-reading-content"),
       ],
       data: { moedict: "mainland-reading-parent", altReadingType: "大陸音讀" },
     });
@@ -173,17 +170,20 @@ export async function addTermsLiangAn(
   const dataLiangAn = utils.sheet_to_json(sheetLiangAn) as LiangAnEntry[];
 
   let b = 0;
+  // One sequence number per source entry, shared by its traditional/simplified rows and
+  // identical in both editions, so that consumers can group the rows back together.
+  let sequence = 0;
   for (const entry of dataLiangAn) {
     // preprocess a little bit
     for (const key in entry) {
       if (typeof entry[key] === "string") {
-        entry[key] = entry[key].replaceAll("\u0261", "g").trim();
+        entry[key] = entry[key].replaceAll("ɡ", "g").trim();
       }
       // some keys have "丨" in them (supposed to be used in vertical text, but we use horizontal text)
       if (["臺灣音讀", "大陸音讀"].includes(key) || key.startsWith("釋義")) {
         entry[key] = (entry[key] ?? "").replaceAll("丨", "ㄧ");
         if (["臺灣音讀", "大陸音讀"].includes(key))
-          entry[key] = entry[key].replace(/[ \u3000\uff0c]/g, "") ?? "";
+          entry[key] = entry[key].replace(/[ 　，]/g, "") ?? "";
       } else if (["臺灣漢拼", "大陸漢拼"].includes(key)) {
         entry[key] = parsePinyin(
           entry[key]?.trim()?.replace(/[-,]/g, " ") ?? ""
@@ -203,6 +203,8 @@ export async function addTermsLiangAn(
       "臺／陸特有音": taiwanOrChinaReading,
       音序: order,
     } = entry;
+    // the sheet leaves 簡化字形 empty when it equals 正體字形
+    const hasDistinctSimplified = !!termSimpl && termTrad !== termSimpl;
     const termsParent: StructuredContentNode = {
       tag: "span",
       content: [],
@@ -213,7 +215,7 @@ export async function addTermsLiangAn(
       content: `${termTrad}`,
       data: { moedict: "traditional-term" },
     });
-    if (!!termSimpl && termTrad !== termSimpl)
+    if (hasDistinctSimplified)
       (termsParent.content as StructuredContentNode[]).push({
         tag: "span",
         content: `${termSimpl}`,
@@ -235,14 +237,19 @@ export async function addTermsLiangAn(
         break;
       }
     }
-    const contentZhuyin: StructuredContent = [
+    // The mainland reading block is shown when it differs in either system, and then carries
+    // both systems, so the content is identical in the zhuyin and pinyin editions.
+    const mainlandDiffers =
+      (!!mZhuyinReading && mZhuyinReading !== zhuyinReading) ||
+      (!!mPinyinReading && mPinyinReading !== pinyinReading);
+    const content: StructuredContent = [
       {
         tag: "span",
         content: [
           termsParent,
           getAdditionalInfo(
-            mZhuyinReading && mZhuyinReading !== zhuyinReading
-              ? mZhuyinReading
+            mainlandDiffers
+              ? { zhuyin: mZhuyinReading, pinyin: mPinyinReading }
               : undefined,
             taiwanOrChinaTerm,
             taiwanOrChinaReading
@@ -252,42 +259,28 @@ export async function addTermsLiangAn(
       },
       meaningsParent,
     ];
-    const contentPinyin: StructuredContent = [
-      {
-        tag: "span",
-        content: [
-          termsParent,
-          getAdditionalInfo(
-            mPinyinReading && mPinyinReading !== pinyinReading
-              ? mPinyinReading
-              : undefined,
-            taiwanOrChinaTerm,
-            taiwanOrChinaReading
-          ),
-        ],
-        data: { moedict: "first-row-parent" },
-      },
-      meaningsParent,
-    ];
+    const entrySequence = ++sequence;
     const zhuyinTermEntry = new TermEntry(termTrad)
       .setReading(zhuyinReading)
+      .setSequenceNumber(entrySequence)
       .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
       .addDetailedDefinition({
         type: "structured-content",
-        content: { tag: "span", content: contentZhuyin, lang: "zh-TW" },
+        content: { tag: "span", content, lang: "zh-TW" },
       });
     const pinyinTermEntry = new TermEntry(termTrad)
       .setReading(pinyinReading ?? "")
+      .setSequenceNumber(entrySequence)
       .setPopularity(order ? -parseInt(order) + popularityBoost : 0)
       .addDetailedDefinition({
         type: "structured-content",
-        content: { tag: "span", content: contentPinyin, lang: "zh-TW" },
+        content: { tag: "span", content, lang: "zh-TW" },
       });
     await Promise.all([
       liangAnDicZhuyin.addTerm(zhuyinTermEntry.build()),
       liangAnDicPinyin.addTerm(pinyinTermEntry.build()),
     ]);
-    if (termTrad !== termSimpl) {
+    if (hasDistinctSimplified) {
       zhuyinTermEntry.setTerm(termSimpl);
       pinyinTermEntry.setTerm(termSimpl);
       await Promise.all([

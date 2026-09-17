@@ -36,3 +36,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 build/
 
 fix-eye.ts
+
+# generated per-edition stylesheets
+styles-pinyin.css
+styles-zhuyin.css
