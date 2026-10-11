@@ -6,7 +6,7 @@ import type {
   StructuredContent,
   StructuredContentNode,
 } from "yomichan-dict-builder/dist/types/yomitan/termbank";
-import { parsePinyin } from "./utils.ts";
+import { parsePinyin, unresolvedPinyin } from "./utils.ts";
 import { hasReading, readingSpans, type SystemReadings } from "./readings.ts";
 
 const someLiangAnEntry = {
@@ -44,6 +44,20 @@ type LiangAnEntry = Record<string, string | undefined> &
   typeof someLiangAnEntry & {
     [K in Meanings]?: string;
   };
+
+// Pinyin cells that are truncated or garbled in the sheet itself. The zhuyin cell of the same row is intact,
+// so they are corrected from it. (All of them show up in the "disagree with the zhuyin cell" report of the build.)
+const PINYIN_TYPOS: Record<string, string> = {
+  "wánní-fēngguā": "wánní-fēngguān", // 丸泥封關 ㄍㄨㄢ
+  "chúguānxī": "chúguāngxī", // 儲光羲 ㄍㄨㄤ
+  "hòutǔniángniɑg": "hòutǔniángniang", // 后土娘娘 ˙ㄋㄧㄤ
+  "hūniú-hūm": "hūniú-hūmǎ", // 呼牛呼馬 ㄇㄚˇ
+  "wécí": "wéicí", // 微辭 ㄨㄟˊ
+  "uānpí-chūyǔ": "zuānpí-chūyǔ", // 鑽皮出羽 ㄗㄨㄢ
+  "jīnjiùyuàn diào mǎshǒuzhēn wén bìngxù": "jīngjiùyuàn diào mǎshǒuzhēn wén bìngxù", // 經舊苑弔馬守貞文並序 ㄐㄧㄥ
+  "qiānr-bābǎ": "qiānr-bābǎi", // 千兒八百 (大陸) ㄅㄞˇ
+  "mùyǔ-zhìfēn": "mùyǔ-zhìfēng", // 沐雨櫛風 (大陸) ㄈㄥ
+};
 
 function getContent(contentRow: string, term: string): StructuredContentNode {
   let note: StructuredContentNode = "";
@@ -174,6 +188,9 @@ export async function addTermsLiangAn(
   // identical in both editions, so that consumers can group the rows back together.
   let sequence = 0;
   for (const entry of dataLiangAn) {
+    // The zhuyin cells still have their per-syllable spacing at this point (the loop below strips it for the
+    // zhuyin edition's readings); parsePinyin uses that spacing to check where the joined pinyin has to be cut.
+    const zhuyinAsTyped = { 臺灣漢拼: entry.臺灣音讀, 大陸漢拼: entry.大陸音讀 };
     // preprocess a little bit
     for (const key in entry) {
       if (typeof entry[key] === "string") {
@@ -184,10 +201,9 @@ export async function addTermsLiangAn(
         entry[key] = (entry[key] ?? "").replaceAll("丨", "ㄧ");
         if (["臺灣音讀", "大陸音讀"].includes(key))
           entry[key] = entry[key].replace(/[ 　，]/g, "") ?? "";
-      } else if (["臺灣漢拼", "大陸漢拼"].includes(key)) {
-        entry[key] = parsePinyin(
-          entry[key]?.trim()?.replace(/[-,]/g, " ") ?? ""
-        );
+      } else if (key === "臺灣漢拼" || key === "大陸漢拼") {
+        const cell = entry[key] ?? "";
+        entry[key] = parsePinyin(PINYIN_TYPOS[cell] ?? cell, zhuyinAsTyped[key]);
       }
     }
 
@@ -292,4 +308,9 @@ export async function addTermsLiangAn(
       console.log(`Processed ${b} entries`);
     }
   }
+  if (unresolvedPinyin.length)
+    console.log(
+      `${unresolvedPinyin.length} pinyin cells disagree with the zhuyin cell of their row (typos in the sheet):\n  ` +
+        unresolvedPinyin.join("\n  ")
+    );
 }
