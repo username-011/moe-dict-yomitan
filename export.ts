@@ -6,13 +6,9 @@ import { readFileSync, writeFileSync } from "fs";
 
 // JSZip re-encodes string inputs to UTF-8 in 16 KiB chunks, so a surrogate pair (an astral CJK
 // character) that straddles a chunk boundary turns into two U+FFFD characters. Hand it bytes.
-(Dictionary.prototype as any).saveJsonToZip = async function (
-  fileName: string,
-  data: unknown,
-) {
+(Dictionary.prototype as any).saveJsonToZip = async function (fileName: string, data: unknown) {
   this.zip.file(fileName, Buffer.from(JSON.stringify(data), "utf8"));
 };
-
 
 // Output directory for the zips and index files (the release workflow publishes build/*).
 const OUT_DIR = process.env.OUT_DIR ?? "build";
@@ -20,7 +16,7 @@ const OUT_DIR = process.env.OUT_DIR ?? "build";
 const versions = {
   moeConcised: "2026/02/06.1",
   moeRevised: "2026/01/30.2",
-  liangAn: "2026/01/27.1",
+  liangAn: "2026/10/11.1",
 };
 
 // for the concised and revised moe dictionaries
